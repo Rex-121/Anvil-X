@@ -28,10 +28,17 @@ TODO: Add long description of the pod here.
   s.source           = { :git => 'https://github.com/Rex/GINetworking.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
-  s.ios.deployment_target = '8.0'
+  s.ios.deployment_target = '9.0'
 
-  s.source_files = 'GINetworking/Classes/**/*'
   
+  
+  s.default_subspec = 'Core'
+  
+  s.subspec 'Core' do |core|
+      
+      core.source_files = 'GINetworking/Core/**/*'
+      
+      end
   # s.resource_bundles = {
   #   'GINetworking' => ['GINetworking/Assets/*.png']
   # }
@@ -39,4 +46,8 @@ TODO: Add long description of the pod here.
   # s.public_header_files = 'Pod/Classes/**/*.h'
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
+  
+  s.dependency 'Moya'
+  s.dependency 'XKit'
+  
 end
