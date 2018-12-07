@@ -29,12 +29,13 @@ class ViewController: UIViewController {
         
         NetProvider<NetBusiness, GIVersion>().go(.appVersion) { (r) in
             switch r {
-            case .success(let result):
-                print(result.result ?? "")
-                print("gasdf" + result.message!)
+            case .success(let result, _):
+                print(result!.updateInformation!)
+                print("gasdf" + result!.leastVersion!)
             case .failure(_): break
             }
         }
+
         
     }
 

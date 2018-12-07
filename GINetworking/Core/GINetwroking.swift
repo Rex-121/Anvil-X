@@ -15,12 +15,12 @@ public enum NetBusiness {
 
 
 
-public extension GITargetType {
+public extension TargetType {
     var baseURL: URL { return URL(string: "https://www.6xhtt.com/app/api")! }
     var headers: [String : String]? { return nil }
 }
 
-extension NetBusiness: GITargetType {
+extension NetBusiness: TargetType {
     public var path: String {
         switch self {
         case .validate(_, _): return "/user/loginValidate"

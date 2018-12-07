@@ -9,34 +9,18 @@ import Moya
 
 import Result
 
-public typealias GITargetType = Moya.TargetType
+public typealias TargetType = Moya.TargetType
 
-public struct GIResult<Target: Codable>: Codable {
-    public var result: Target?
-    
-    public let message: String?
-    
-    public let code: Int?
-    
-    public let status: String?
-    
-    private enum CodingKeys: String, CodingKey {
-        case result = "data", code = "responseCode", message, status
-    }
 
-}
+public typealias NetDone<Care: Codable> = (Result<(Care?, GIResult<Care>), MoyaError>) -> Void
 
-public typealias NetDone<R: Codable> = (_ result: Result<GIResult<R>, MoyaError>) -> Void
-
-struct NoResult: Codable { }
-
-open class NetProvider<T: GITargetType, R: Codable>: MoyaProvider<T>, GI_NetworkingSession {
+open class NetProvider<T: TargetType, Care: Codable>: MoyaProvider<T>, GI_NetworkingSession {
     
     public override init(endpointClosure: @escaping MoyaProvider<T>.EndpointClosure = MoyaProvider<T>.defaultEndpointMapping,
                          requestClosure: @escaping MoyaProvider<T>.RequestClosure = MoyaProvider<T>.defaultRequestMapping,
                          stubClosure: @escaping MoyaProvider<T>.StubClosure = MoyaProvider<T>.neverStub,
                          callbackQueue: DispatchQueue? = nil,
-                         manager: Manager = NetProvider<T, R>.defaultSession(),
+                         manager: Manager = NetProvider<T, Care>.defaultSession(),
                          plugins: [PluginType] = [],
                          trackInflights: Bool = false) {
         super.init(endpointClosure: endpointClosure, requestClosure: requestClosure, stubClosure: stubClosure, callbackQueue: callbackQueue, manager: manager, plugins: plugins, trackInflights: trackInflights)
@@ -44,26 +28,20 @@ open class NetProvider<T: GITargetType, R: Codable>: MoyaProvider<T>, GI_Network
     }
     
     @discardableResult
-    public func go(_ t: T, done: @escaping NetDone<R>) -> Cancellable {
+    public func go(_ t: T, done: @escaping NetDone<Care>) -> Cancellable {
         
         return super.request(t, completion: { (result) in
             switch result {
             case .success(let r):
-                
+
                 do {
-                    let k = try JSONDecoder().decode(GIResult<R>.self, from: r.data)
-                    done(Result.success(k))
+                    let k = try JSONDecoder().decode(GIResult<Care>.self, from: r.data)
+                    
+                    done(Result.success(k.truck))
                 } catch {
                     done(Result.failure(MoyaError.requestMapping(error.localizedDescription)))
                 }
-                
-                
-                //                    if let new = GIResult(r.data) {
-                //                        done(Result.success(new))
-                //                    }
-                //                    else {
-                //                        done(Result.failure(MoyaError.requestMapping("unknow")))
-            //                    }
+
             case .failure(let error):
                 done(Result.failure(error))
             }
@@ -71,3 +49,15 @@ open class NetProvider<T: GITargetType, R: Codable>: MoyaProvider<T>, GI_Network
     }
     
 }
+
+/** 代码可用
+extension Result where Value == Response, Error == MoyaError {
+    func take<Care: Codable>(care: Care.Type) throws -> GIResult<Care> {
+        switch self {
+        case .success(let r):
+            return try JSONDecoder().decode(GIResult<Care>.self, from: r.data)
+        case .failure(let error): throw error
+        }
+    }
+}
+*/
