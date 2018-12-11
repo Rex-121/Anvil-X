@@ -4,7 +4,7 @@ target 'GINetworking_Example' do
     
   pod 'GINetworking', :path => '../'
 
-  pod 'XKit', :path => '/Users/ray/XKit'
+  pod 'XKit', :path => '/Users/ray/OTC/submodules/XKit'
   
   target 'GINetworking_Tests' do
     inherit! :search_paths

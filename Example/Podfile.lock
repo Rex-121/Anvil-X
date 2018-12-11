@@ -17,7 +17,7 @@ PODS:
 
 DEPENDENCIES:
   - GINetworking (from `../`)
-  - XKit (from `/Users/ray/XKit`)
+  - XKit (from `/Users/ray/OTC/submodules/XKit`)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -29,7 +29,7 @@ EXTERNAL SOURCES:
   GINetworking:
     :path: "../"
   XKit:
-    :path: "/Users/ray/XKit"
+    :path: "/Users/ray/OTC/submodules/XKit"
 
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
@@ -38,6 +38,6 @@ SPEC CHECKSUMS:
   Result: 7645bb3f50c2ce726dd0ff2fa7b6f42bbe6c3713
   XKit: d143010ef48c7fca3e3a86a8c214e87ba47f5ae0
 
-PODFILE CHECKSUM: 62271203d6c3f76b4e952a469eefd9ba4ac0419c
+PODFILE CHECKSUM: 4b3e4256d5cdcfe3ef9b0c2c12c162e32707986a
 
 COCOAPODS: 1.5.0

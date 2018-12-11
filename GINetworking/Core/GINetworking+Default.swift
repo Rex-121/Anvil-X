@@ -44,7 +44,7 @@ public extension GI_NetworkingSession {
         let userAgent: String = {
             if let info = Bundle.main.infoDictionary {
                 let executable = info[kCFBundleExecutableKey as String] as? String ?? "Unknown"
-                let appVersion = Bundle.main.appVersion.versionString
+                let appVersion = Bundle.main.x.appVersion.versionString
                 let appBuild = info[kCFBundleVersionKey as String] as? String ?? "Unknown"
                 
                 let osNameVersion: String = {
