@@ -11,7 +11,6 @@ import Result
 
 public typealias TargetType = Moya.TargetType
 
-
 public typealias NetDone<Care: Codable> = (Result<(Care?, GIResult<Care>), MoyaError>) -> Void
 
 open class NetProvider<T: TargetType, Care: Codable>: MoyaProvider<T>, GI_NetworkingSession {

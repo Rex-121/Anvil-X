@@ -27,14 +27,14 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         
         
-        NetProvider<NetBusiness, GIVersion>().go(.appVersion) { (r) in
-            switch r {
-            case .success(let result, _):
-                print(result!.updateInformation!)
-                print("gasdf" + result!.leastVersion!)
-            case .failure(_): break
-            }
-        }
+//        NetProvider<NetBusiness, GIVersion>().go(.appVersion) { (r) in
+//            switch r {
+//            case .success(let result, _):
+//                print(result!.updateInformation!)
+//                print("gasdf" + result!.leastVersion!)
+//            case .failure(_): break
+//            }
+//        }
 
         
     }

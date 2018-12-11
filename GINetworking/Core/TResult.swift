@@ -5,10 +5,14 @@
 //  Created by Ray on 2018/12/6.
 //
 
-import Foundation
+import Moya
 
+public typealias MFData = Moya.MultipartFormData
+extension Dictionary where Value == String, Key == String {
+    public func multipartData() -> [MFData] { return self.map { MultipartFormData(provider: .data($1.data(using: .utf8)!), name: $0) } }
+}
 
-public struct NoResult: Codable { }
+public struct DontCare: Codable { }
 
 public struct GIResult<Care: Codable>: Codable {
     
