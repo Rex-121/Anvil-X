@@ -11,7 +11,7 @@ import Result
 
 public typealias TargetType = Moya.TargetType
 
-public typealias NetDone<Care: Codable> = (Result<(Care?, GIResult<Care>), MoyaError>) -> Void
+public typealias NetDone<Care: Codable> = (Result<GIResult<Care>, MoyaError>) -> Void
 
 open class NetProvider<T: TargetType, Care: Codable>: MoyaProvider<T>, GI_NetworkingSession {
     
@@ -36,7 +36,7 @@ open class NetProvider<T: TargetType, Care: Codable>: MoyaProvider<T>, GI_Networ
                 do {
                     let k = try JSONDecoder().decode(GIResult<Care>.self, from: r.data)
                     
-                    done(Result.success(k.truck))
+                    done(Result.success(k))
                 } catch {
                     done(Result.failure(MoyaError.requestMapping(error.localizedDescription)))
                 }

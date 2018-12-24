@@ -16,6 +16,7 @@ public struct DontCare: Codable { }
 
 public struct GIResult<Care: Codable>: Codable {
     
+    /// 解析的结构
     public var result: Care?
     
     ///信息
@@ -33,13 +34,13 @@ public struct GIResult<Care: Codable>: Codable {
     
 }
 
-extension GIResult {
-    
-    /// (解析的结构，请求信息)
-    var truck: (Care?, GIResult) {
-        return (self.result, self)
-    }
-}
+//extension GIResult {
+//    
+//    /// (解析的结构，请求信息)
+//    var truck: (Care?, GIResult) {
+//        return (self.result, self)
+//    }
+//}
 
 //public enum XResult: Codable {
 //
