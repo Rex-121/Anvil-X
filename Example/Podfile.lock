@@ -2,15 +2,18 @@ PODS:
   - Alamofire (4.8.0)
   - GINetworking (0.1.0):
     - GINetworking/Core (= 0.1.0)
-    - Moya
+    - Moya/ReactiveSwift
     - XKit
   - GINetworking/Core (0.1.0):
-    - Moya
+    - Moya/ReactiveSwift
     - XKit
-  - Moya (12.0.1):
-    - Moya/Core (= 12.0.1)
   - Moya/Core (12.0.1):
     - Alamofire (~> 4.1)
+    - Result (~> 4.0)
+  - Moya/ReactiveSwift (12.0.1):
+    - Moya/Core
+    - ReactiveSwift (~> 4.0)
+  - ReactiveSwift (4.0.0):
     - Result (~> 4.0)
   - Result (4.0.0)
   - XKit (0.1.0)
@@ -23,6 +26,7 @@ SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
     - Alamofire
     - Moya
+    - ReactiveSwift
     - Result
 
 EXTERNAL SOURCES:
@@ -33,8 +37,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Alamofire: 3ec537f71edc9804815215393ae2b1a8ea33a844
-  GINetworking: 4051863f91532632a90632a329fd2e69713e197a
+  GINetworking: 3683a66a7aa8d53becea633784d7b35b80b47cd4
   Moya: cf730b3cd9e005401ef37a85143aa141a12fd38f
+  ReactiveSwift: a2bb9ace428a109e9c0209615645d9d286c8c433
   Result: 7645bb3f50c2ce726dd0ff2fa7b6f42bbe6c3713
   XKit: d143010ef48c7fca3e3a86a8c214e87ba47f5ae0
 

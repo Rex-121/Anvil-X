@@ -8,7 +8,7 @@
 import Moya
 
 import Result
-
+import ReactiveSwift
 public typealias TargetType = Moya.TargetType
 
 public typealias NetDone<Care: Codable> = (Result<GIResult<Care>, MoyaError>) -> Void
@@ -24,6 +24,17 @@ open class NetProvider<T: TargetType, Care: Codable>: MoyaProvider<T>, GI_Networ
                          trackInflights: Bool = false) {
         super.init(endpointClosure: endpointClosure, requestClosure: requestClosure, stubClosure: stubClosure, callbackQueue: callbackQueue, manager: manager, plugins: plugins, trackInflights: trackInflights)
         
+    }
+    
+    public func go(_ t: T) -> SignalProducer<GIResult<Care>, MoyaError> {
+        return super.reactive.request(t).map({ (response) -> GIResult<Care> in
+            do {
+                let k = try JSONDecoder().decode(GIResult<Care>.self, from: response.data)
+                return k
+            } catch {
+                return GIResult.ParseWrong
+            }
+        })
     }
     
     @discardableResult

@@ -34,6 +34,12 @@ public struct GIResult<Care: Codable>: Codable {
     
 }
 
+extension GIResult {
+    static var ParseWrong: GIResult {
+        return GIResult(result: nil, message: "解析错误", code: -999, status: "")
+    }
+}
+
 //extension GIResult {
 //    
 //    /// (解析的结构，请求信息)
