@@ -13,20 +13,20 @@ public typealias TargetType = Moya.TargetType
 
 public typealias NetDone<Care: Codable> = (Result<GIResult<Care>, MoyaError>) -> Void
 
-open class NetProvider<T: TargetType, Care: Codable>: MoyaProvider<T>, GI_NetworkingSession {
+open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
     
     public override init(endpointClosure: @escaping MoyaProvider<T>.EndpointClosure = MoyaProvider<T>.defaultEndpointMapping,
                          requestClosure: @escaping MoyaProvider<T>.RequestClosure = MoyaProvider<T>.defaultRequestMapping,
                          stubClosure: @escaping MoyaProvider<T>.StubClosure = MoyaProvider<T>.neverStub,
                          callbackQueue: DispatchQueue? = nil,
-                         manager: Manager = NetProvider<T, Care>.defaultSession(),
+                         manager: Manager = NetProvider<T>.defaultSession(),
                          plugins: [PluginType] = [],
                          trackInflights: Bool = false) {
         super.init(endpointClosure: endpointClosure, requestClosure: requestClosure, stubClosure: stubClosure, callbackQueue: callbackQueue, manager: manager, plugins: plugins, trackInflights: trackInflights)
         
     }
     
-    public func go(_ t: T) -> SignalProducer<GIResult<Care>, MoyaError> {
+    public func go<Care: Codable>(_ t: T, _ c: Care.Type) -> SignalProducer<GIResult<Care>, MoyaError> {
         return super.reactive.request(t).map({ (response) -> GIResult<Care> in
             do {
                 let k = try JSONDecoder().decode(GIResult<Care>.self, from: response.data)
@@ -37,15 +37,19 @@ open class NetProvider<T: TargetType, Care: Codable>: MoyaProvider<T>, GI_Networ
         })
     }
     
+    public func go(_ t: T) -> SignalProducer<GIResult<DontCare>, MoyaError> {
+        return self.go(t, DontCare.self)
+    }
+    
     @discardableResult
-    public func go(_ t: T, done: @escaping NetDone<Care>) -> Cancellable {
+    public func go<C: Codable>(_ t: T, done: @escaping NetDone<C>) -> Cancellable {
         
         return super.request(t, completion: { (result) in
             switch result {
             case .success(let r):
 
                 do {
-                    let k = try JSONDecoder().decode(GIResult<Care>.self, from: r.data)
+                    let k = try JSONDecoder().decode(GIResult<C>.self, from: r.data)
                     
                     done(Result.success(k))
                 } catch {

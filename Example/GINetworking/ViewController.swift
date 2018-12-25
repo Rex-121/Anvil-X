@@ -10,6 +10,8 @@ import UIKit
 
 import GINetworking
 
+import Moya
+
 class ViewController: UIViewController {
     
     struct GIVersion: Codable {
@@ -23,18 +25,19 @@ class ViewController: UIViewController {
         let isUpdate: Int
     }
 
+    let n = NetProvider<NetBusiness>()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         
-//        NetProvider<NetBusiness, GIVersion>().go(.appVersion) { (r) in
-//            switch r {
-//            case .success(let result, _):
-//                print(result!.updateInformation!)
-//                print("gasdf" + result!.leastVersion!)
-//            case .failure(_): break
-//            }
-//        }
+        n.go(.appVersion, GIVersion.self).startWithResult { (result) in
+            print(result)
+        }
+        
+        n.go(.appVersion).startWithResult { (result) in
+            print(result)
+        }
 
         
     }
@@ -46,3 +49,45 @@ class ViewController: UIViewController {
 
 }
 
+enum NetBusiness {
+    case validate(String, String), issueCoin, login(String, String), appVersion
+}
+
+
+
+extension TargetType {
+    var baseURL: URL { return URL(string: "https://www.6xhtt.com/app/api")! }
+    var headers: [String : String]? { return nil }
+}
+
+extension NetBusiness: TargetType {
+    public var path: String {
+        switch self {
+        case .validate(_, _): return "/user/loginValidate"
+        case .issueCoin: return "/newc2c/issuedCoin"
+        case .login(_, _): return "/user/login"
+        case .appVersion: return "/index/getAppVersion"
+        }
+    }
+    public var method: Moya.Method {
+        switch self {
+        case .validate(_, _), .login(_, _), .appVersion: return .post
+        case .issueCoin: return .get
+        }
+    }
+
+    public var sampleData: Data {
+        return Data()
+    }
+
+    public var task: Task {
+        switch self {
+
+        case .validate(let n, let p): return .uploadMultipart(["username":n, "password":p].multipartData())
+        case .issueCoin:              return .requestPlain
+        case .login(let n, let p):    return .uploadMultipart(["username":n, "password":p].multipartData())
+        case .appVersion:             return .requestPlain
+        }
+    }
+
+}
