@@ -26,10 +26,12 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         
     }
     
-    public func go<Care: Codable>(_ t: T, _ c: Care.Type) -> SignalProducer<GIResult<Care>, MoyaError> {
+    open func go<Care: Codable>(_ t: T, _ c: Care.Type) -> SignalProducer<GIResult<Care>, MoyaError> {
         return super.reactive.request(t).map({ (response) -> GIResult<Care> in
             do {
                 let k = try JSONDecoder().decode(GIResult<Care>.self, from: response.data)
+                let gg = try? JSONSerialization.jsonObject(with: response.data, options: [])
+                print(gg ?? "")
                 return k
             } catch {
                 return GIResult.ParseWrong

@@ -23,20 +23,23 @@ public struct GIResult<Care: Codable>: Codable {
     public let message: String?
     
     ///请求码
-    public let code: Int?
+    public let code: String?
     
     ///请求状态
-    public let status: String?
+//    public let status: String?
+    
+    public let good: Bool
     
     private enum CodingKeys: String, CodingKey {
-        case result = "data", code = "responseCode", message, status
+        case result = "obj", code, message = "msg", good = "success"
     }
     
 }
 
 extension GIResult {
-    static var ParseWrong: GIResult {
-        return GIResult(result: nil, message: "解析错误", code: -999, status: "")
+    public static var ParseWrong: GIResult {
+        return GIResult(result: nil, message: "解析错误", code: "-999", good: false)
+//        return GIResult(result: nil, message: "解析错误", code: -999, status: "")
     }
 }
 
