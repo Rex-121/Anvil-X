@@ -34,6 +34,16 @@ public struct GIResult<Care: Codable>: Codable {
         case result = "obj", code, message = "msg", good = "success"
     }
     
+    /// 是否成功，后台信息
+    public var info: BasicInfo {
+        return BasicInfo(success: good, message: message)
+    }
+
+}
+
+public struct BasicInfo {
+    public let success: Bool
+    public let message: String?
 }
 
 extension GIResult {
