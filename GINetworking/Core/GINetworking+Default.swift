@@ -24,6 +24,8 @@ public extension GI_NetworkingSession {
     
     public static func defaultSession() -> SessionManager {
         let configuration = URLSessionConfiguration.default
+        configuration.timeoutIntervalForRequest = 20
+        configuration.timeoutIntervalForResource = 30
         configuration.httpAdditionalHeaders = Self.defaultHTTPHeader
         return SessionManager(configuration: configuration, delegate: SessionDelegate(), serverTrustPolicyManager: Self.defaultPolicy())
     }
@@ -64,8 +66,7 @@ public extension GI_NetworkingSession {
         return [
             "Accept-Encoding": acceptEncoding,
             "Accept-Language": acceptLanguage,
-            "User-Agent": userAgent,
-            "Cookie": "Language=zh_CN"
+            "User-Agent": userAgent
         ]
     }
     
