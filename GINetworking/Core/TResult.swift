@@ -49,7 +49,10 @@ public struct BasicInfo {
 extension GIResult {
     public static var ParseWrong: GIResult {
         return GIResult(result: nil, message: "解析错误", code: "-999", good: false)
-//        return GIResult(result: nil, message: "解析错误", code: -999, status: "")
+    }
+    
+    public static var NotFound: GIResult {
+        return GIResult(result: nil, message: "无法连接到服务器", code: "404", good: false)
     }
 }
 
