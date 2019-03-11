@@ -11,7 +11,7 @@ import Result
 import ReactiveSwift
 public typealias TargetType = Moya.TargetType
 
-public typealias NetDone<Care: Codable> = (Result<GIResult<Care>, MoyaError>) -> Void
+//public typealias NetDone<Care: Codable> = (Result<GIResult<Care>, MoyaError>) -> Void
 
 open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
     
@@ -29,10 +29,7 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
     open func go<Care: Codable>(_ t: T, _ c: Care.Type) -> SignalProducer<GIResult<Care>, MoyaError> {
         return super.reactive.request(t).map({ (response) -> GIResult<Care> in
             do {
-                let k = try JSONDecoder().decode(GIResult<Care>.self, from: response.data)
-                let gg = try? JSONSerialization.jsonObject(with: response.data, options: [])
-                print(gg ?? "")
-                return k
+                return try JSONDecoder().decode(GIResult<Care>.self, from: response.data)
             } catch {
                 return GIResult.ParseWrong
             }
@@ -43,26 +40,26 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         return self.go(t, DontCare.self)
     }
     
-    @discardableResult
-    public func go<C: Codable>(_ t: T, done: @escaping NetDone<C>) -> Cancellable {
-        
-        return super.request(t, completion: { (result) in
-            switch result {
-            case .success(let r):
-
-                do {
-                    let k = try JSONDecoder().decode(GIResult<C>.self, from: r.data)
-                    
-                    done(Result.success(k))
-                } catch {
-                    done(Result.failure(MoyaError.requestMapping(error.localizedDescription)))
-                }
-
-            case .failure(let error):
-                done(Result.failure(error))
-            }
-        })
-    }
+//    @discardableResult
+//    public func go<C: Codable>(_ t: T, done: @escaping NetDone<C>) -> Cancellable {
+//        
+//        return super.request(t, completion: { (result) in
+//            switch result {
+//            case .success(let r):
+//
+//                do {
+//                    let k = try JSONDecoder().decode(GIResult<C>.self, from: r.data)
+//                    
+//                    done(Result.success(k))
+//                } catch {
+//                    done(Result.failure(MoyaError.requestMapping(error.localizedDescription)))
+//                }
+//
+//            case .failure(let error):
+//                done(Result.failure(error))
+//            }
+//        })
+//    }
     
 }
 
