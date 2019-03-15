@@ -56,6 +56,36 @@ extension GIResult {
     }
 }
 
+
+public enum GINetError: Error, CustomStringConvertible {
+    case business(Info), network(String, Response?)
+    
+    public struct Info {
+        let code: String?
+        let message: String?
+    }
+    
+    public var message: String? {
+        switch self {
+        case .business(let info): return info.message
+        case .network(let info, _): return info
+        }
+    }
+    
+    public var reason: String {
+        switch self {
+        case .business: return message ?? ""
+        case .network: return message!
+        }
+    }
+    
+    public var description: String {
+        return reason
+    }
+    
+}
+
+
 //extension GIResult {
 //    
 //    /// (解析的结构，请求信息)

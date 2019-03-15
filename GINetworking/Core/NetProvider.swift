@@ -7,7 +7,7 @@
 
 import Moya
 
-import Result
+import enum Result.Result
 import ReactiveSwift
 public typealias TargetType = Moya.TargetType
 
@@ -26,8 +26,8 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         
     }
     
-    open func go<Care: Codable>(_ t: T, _ c: Care.Type) -> SignalProducer<GIResult<Care>, MoyaError> {
-        return super.reactive.request(t).map({ (response) -> GIResult<Care> in
+    open func go<Care: Codable>(_ target: T, _ codable: Care.Type) -> SignalProducer<GIResult<Care>, MoyaError> {
+        return super.reactive.request(target).map({ (response) -> GIResult<Care> in
             do {
                 return try JSONDecoder().decode(GIResult<Care>.self, from: response.data)
             } catch {
@@ -36,31 +36,32 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         })
     }
     
-    public func go(_ t: T) -> SignalProducer<GIResult<DontCare>, MoyaError> {
-        return self.go(t, DontCare.self)
+    open func launch<Care: Codable>(_ target: T, _ codable: Care.Type) -> SignalProducer<GIResult<Care>, GINetError> {
+        return super.reactive.request(target)
+            .map({ (response) -> GIResult<Care> in
+                do {
+                    return try JSONDecoder().decode(GIResult<Care>.self, from: response.data)
+                } catch {
+                    return GIResult.ParseWrong
+                }
+            })
+            .mapError({ (moyaError) -> GINetError in
+                return GINetError.network(moyaError.localizedDescription, moyaError.response)
+            })
+            .attempt({ (result) -> Result<(), GINetError> in
+                if result.good { return Result(()) }
+                return Result(error: GINetError.business(GINetError.Info(code: result.code, message: result.message)))
+            })
     }
     
-//    @discardableResult
-//    public func go<C: Codable>(_ t: T, done: @escaping NetDone<C>) -> Cancellable {
-//        
-//        return super.request(t, completion: { (result) in
-//            switch result {
-//            case .success(let r):
-//
-//                do {
-//                    let k = try JSONDecoder().decode(GIResult<C>.self, from: r.data)
-//                    
-//                    done(Result.success(k))
-//                } catch {
-//                    done(Result.failure(MoyaError.requestMapping(error.localizedDescription)))
-//                }
-//
-//            case .failure(let error):
-//                done(Result.failure(error))
-//            }
-//        })
-//    }
+    open func launch(_ target: T) -> SignalProducer<GIResult<DontCare>, GINetError> {
+        return self.launch(target, DontCare.self)
+    }
     
+    public func go(_ target: T) -> SignalProducer<GIResult<DontCare>, MoyaError> {
+        return self.go(target, DontCare.self)
+    }
+
 }
 
 /** 代码可用
