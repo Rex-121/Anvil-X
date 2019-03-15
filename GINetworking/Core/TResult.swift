@@ -60,6 +60,10 @@ extension GIResult {
 public enum GINetError: Error, CustomStringConvertible {
     case business(Info), network(String, Response?)
     
+    public static var ParseWrong: GINetError {
+        return .business(Info(code: "-999", message: "解析错误"))
+    }
+    
     public struct Info {
         let code: String?
         let message: String?
