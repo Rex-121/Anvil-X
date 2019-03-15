@@ -9,9 +9,8 @@ import Moya
 
 import enum Result.Result
 import ReactiveSwift
-public typealias TargetType = Moya.TargetType
 
-//public typealias NetDone<Care: Codable> = (Result<GIResult<Care>, MoyaError>) -> Void
+public typealias TargetType = Moya.TargetType
 
 open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
     
@@ -36,6 +35,13 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         })
     }
     
+    
+    /// 网络请求
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    ///   - codable: 解析方式
+    /// - Returns: GIResult<解析>, GINetError
     open func launch<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, GINetError> {
         return super.reactive.request(target)
             .map({ (response) -> GIResult<Engine> in
@@ -45,15 +51,24 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
                     return GIResult.ParseWrong
                 }
             }).parachute().land()
-//            .mapError({ (moyaError) -> GINetError in
-//                return GINetError.network(moyaError.localizedDescription, moyaError.response)
-//            })
-//            .attempt({ (result) -> Result<(), GINetError> in
-//                if result.good { return Result(()) }
-//                return Result(error: GINetError.business(GINetError.Info(code: result.code, message: result.message)))
-//            })
     }
     
+    /// 网络请求
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    /// - Returns: GIResult<DontCare>, GINetError
+    open func launch(_ target: T) -> SignalProducer<GIResult<DontCare>, GINetError> {
+        return self.launch(target, DontCare.self)
+    }
+    
+    
+    /// 网络请求
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    ///   - codable: 解析方式
+    /// - Returns: 解析, GINetError
     open func detach<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<Engine, GINetError> in
             guard let result = result.result else { return Result(error: .ParseWrong) }
@@ -61,9 +76,15 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         })
     }
     
-    open func launch(_ target: T) -> SignalProducer<GIResult<DontCare>, GINetError> {
-        return self.launch(target, DontCare.self)
+    /// 网络请求
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    /// - Returns: GIResult<DontCare>, GINetError
+    open func detach(_ target: T) -> SignalProducer<(), GINetError> {
+        return self.detach(target, DontCare.self).map { _ in () }
     }
+    
     
     public func go(_ target: T) -> SignalProducer<GIResult<DontCare>, MoyaError> {
         return self.go(target, DontCare.self)
@@ -87,11 +108,21 @@ extension NetProvider {
         }
     }
 
+    
+    
+    
+    /// 尝试解码2次
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    ///   - engine: 主解析，失败后采用副解析
+    ///   - second: 副解析
+    /// - Returns: SignalProducer<NetProvider.Engine<Engine, Second>, GINetError>
     open func launch<Engine: Codable, Second: Codable>(_ target: Target, main engine: Engine.Type, second: Second.Type) -> SignalProducer<NetProvider.Engine<Engine, Second>, GINetError> {
-        let a: [Codable.Type] = [engine, second]
         
         return super.reactive.request(target)
-            .parachute().attemptMap { (response) -> Result<NetProvider.Engine<Engine, Second>, GINetError> in
+            .parachute()
+            .attemptMap { (response) -> Result<NetProvider.Engine<Engine, Second>, GINetError> in
                 
                 let mainEngine = try? JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
                 if let a = mainEngine, let res = a.result {
@@ -107,24 +138,16 @@ extension NetProvider {
                 }
                 
         }
-//            .attempt({ (result) -> Result<(), GINetError> in
-//                switch result {
-//                case .success: return Result(())
-//                case .failure(let e): return Result(error: e)
-//                }
-//            })
     }
     
 }
 
 
-//MARK: -
+//MARK: - TargetSet
 
 fileprivate protocol TargetSet {
     var pass: Bool { get }
     var fianl: Codable? { get }
-//    var code: String? { get }
-//    var message: String? { get }
     var info: GINetError.Info { get }
 }
 
@@ -169,15 +192,3 @@ extension SignalProducer where Value: TargetSet, Error == GINetError {
         }
     }
 }
-
-/** 代码可用
-extension Result where Value == Response, Error == MoyaError {
-    func take<Care: Codable>(care: Care.Type) throws -> GIResult<Care> {
-        switch self {
-        case .success(let r):
-            return try JSONDecoder().decode(GIResult<Care>.self, from: r.data)
-        case .failure(let error): throw error
-        }
-    }
-}
-*/
