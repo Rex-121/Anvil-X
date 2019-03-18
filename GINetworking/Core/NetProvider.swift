@@ -94,15 +94,22 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
 
 extension NetProvider {
     
+    
+    /// 用于解析的结果
+    ///
+    /// - main: 首要解析方式
+    /// - second: 次要解析方式
     public enum Engine<Main: Codable, Second: Codable>: Codable {
         
         case main(Main), second(Second)
         
         public func encode(to encoder: Encoder) throws {
-            
+            switch self {
+            case let .main(main): try main.encode(to: encoder)
+            case let .second(second): try second.encode(to: encoder)
+            }
         }
-        
-        
+
         public init(from decoder: Decoder) throws {
             self = Engine<DontCare, DontCare>.main(DontCare()) as! NetProvider<T>.Engine<Main, Second>
         }
@@ -138,6 +145,12 @@ extension NetProvider {
                 }
                 
         }
+    }
+    
+    private func coding(_ engine: Decodable.Type, with data: Data) throws {
+    
+//        let mainEngine = try JSONDecoder().decode(engine.self, from: data)
+        
     }
     
 }
