@@ -36,18 +36,23 @@ public struct GIResult<Care: Codable>: Codable {
     
     /// 是否成功，后台信息
     public var info: BasicInfo {
-        return BasicInfo(success: good, message: message)
+        return BasicInfo(success: good, message: message, code: code)
     }
 
-    
+    /// 可能的错误信息　
     public var errorInfo: GINetError {
-        return .business(GINetError.Info(code: code, message: message))
+        return .business(info)
     }
+    
 }
 
-public struct BasicInfo {
+public struct BasicInfo: CustomStringConvertible {
     public let success: Bool
     public let message: String?
+    public let code: String?
+    public var description: String {
+        return message ?? ""
+    }
 }
 
 extension GIResult {
@@ -62,33 +67,23 @@ extension GIResult {
 
 
 public enum GINetError: Error, CustomStringConvertible {
-    case business(Info), network(String, Response?)
+    case business(BasicInfo), network(String, Response?)
     
     public static var ParseWrong: GINetError {
-        return .business(Info(code: "-999", message: "解析错误"))
+        return .business(BasicInfo(success: false, message: "解析错误", code: "-999"))
     }
-    
-    public struct Info {
-        let code: String?
-        let message: String?
-    }
-    
-    public var message: String? {
+
+    /// 原始的信息
+    private var message: String? {
         switch self {
         case .business(let info): return info.message
         case .network(let info, _): return info
         }
     }
-    
-    public var reason: String {
-        switch self {
-        case .business: return message ?? ""
-        case .network: return message!
-        }
-    }
-    
+
+    /// 错误信息
     public var description: String {
-        return reason
+        return message ?? ""
     }
     
 }

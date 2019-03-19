@@ -35,6 +35,14 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         })
     }
     
+    public func go(_ target: T) -> SignalProducer<GIResult<DontCare>, MoyaError> {
+        return self.go(target, DontCare.self)
+    }
+
+}
+
+// MARK: - Launch - 返回方式为 `<GIResult<解析>, GINetError>`
+extension NetProvider {
     
     /// 网络请求
     ///
@@ -62,7 +70,10 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         return self.launch(target, DontCare.self)
     }
     
-    
+}
+
+// MARK: - Detach - 返回方式为 `<解析, GINetError>`
+extension NetProvider {
     /// 网络请求
     ///
     /// - Parameters:
@@ -80,20 +91,54 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
     ///
     /// - Parameters:
     ///   - target: 网络目标
-    /// - Returns: GIResult<DontCare>, GINetError
+    /// - Returns: (), GINetError
     open func detach(_ target: T) -> SignalProducer<(), GINetError> {
         return self.detach(target, DontCare.self).map { _ in () }
     }
     
-    
-    public func go(_ target: T) -> SignalProducer<GIResult<DontCare>, MoyaError> {
-        return self.go(target, DontCare.self)
-    }
-
 }
 
+// MARK: - Docking - 返回方式为 `<(解析, BasicInfo), GINetError>`  or  `<BasicInfo, GINetError>`
 extension NetProvider {
     
+    /// 网络请求
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    ///   - codable: 解析方式
+    /// - Returns: <(解析, BasicInfo), GINetError>
+    open func docking<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
+        return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
+            guard let value = result.result else { return Result(error: .ParseWrong) }
+            return Result(value: (value, result.info))
+        })
+    }
+    
+    /// 网络请求
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    ///   - codable: 解析方式
+    /// - Returns: <BasicInfo, GINetError>
+    open func docked<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<BasicInfo, GINetError> {
+        return self.docking(target, codable).map { $1 }
+    }
+
+    /// 网络请求
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    /// - Returns: <BasicInfo, GINetError>
+    open func docked(_ target: T) -> SignalProducer<BasicInfo, GINetError> {
+        return self.docking(target, DontCare.self).map { $1 }
+    }
+    
+}
+
+
+
+// MARK: - 主/次解析方式
+extension NetProvider {
     
     /// 用于解析的结果
     ///
@@ -163,7 +208,7 @@ extension NetProvider {
 fileprivate protocol TargetSet {
     var pass: Bool { get }
     var fianl: Codable? { get }
-    var info: GINetError.Info { get }
+    var info: BasicInfo { get }
 }
 
 extension GIResult: TargetSet {
@@ -174,11 +219,6 @@ extension GIResult: TargetSet {
     var fianl: Codable? {
         return self.result
     }
-    
-    var info: GINetError.Info {
-        return GINetError.Info(code: self.code, message: self.message)
-    }
-
 }
 
 
