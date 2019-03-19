@@ -100,7 +100,6 @@ extension NetProvider {
     /// - main: 首要解析方式
     /// - second: 次要解析方式
     public enum Engine<Main: Codable, Second: Codable>: Codable {
-        
         case main(Main), second(Second)
         
         public func encode(to encoder: Encoder) throws {
@@ -131,17 +130,20 @@ extension NetProvider {
             .parachute()
             .attemptMap { (response) -> Result<NetProvider.Engine<Engine, Second>, GINetError> in
                 
-                let mainEngine = try? JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
-                if let a = mainEngine, let res = a.result {
-                    return Result(value: .main(res))
-                }
-                
                 do {
-                    let secondEngine = try JSONDecoder().decode(GIResult<Second>.self, from: response.data)
-                    guard let res = secondEngine.result else { throw GINetError.ParseWrong }
-                    return Result(value: .second(res))
-                } catch {
-                    return Result(error: GINetError.ParseWrong)
+                    let mainEngine = try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
+                    if mainEngine.good == false { return Result(error: mainEngine.errorInfo) }
+                    if let res = mainEngine.result { return Result(value: .main(res)) }
+                    throw GINetError.ParseWrong
+                }
+                catch {
+                    do {
+                        let secondEngine = try JSONDecoder().decode(GIResult<Second>.self, from: response.data)
+                        guard let res = secondEngine.result else { throw GINetError.ParseWrong }
+                        return Result(value: .second(res))
+                    } catch {
+                        return Result(error: GINetError.ParseWrong)
+                    }
                 }
                 
         }

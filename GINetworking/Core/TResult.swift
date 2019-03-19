@@ -39,6 +39,10 @@ public struct GIResult<Care: Codable>: Codable {
         return BasicInfo(success: good, message: message)
     }
 
+    
+    public var errorInfo: GINetError {
+        return .business(GINetError.Info(code: code, message: message))
+    }
 }
 
 public struct BasicInfo {
