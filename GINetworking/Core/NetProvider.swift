@@ -44,7 +44,7 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
 // MARK: - Launch - 返回方式为 `<GIResult<解析>, GINetError>`
 extension NetProvider {
     
-    /// 网络请求
+    /// 网络请求 <GIResult<解析>, GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
@@ -61,7 +61,7 @@ extension NetProvider {
             }).parachute().land()
     }
     
-    /// 网络请求
+    /// 网络请求 <GIResult<DontCare>, GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
@@ -74,7 +74,7 @@ extension NetProvider {
 
 // MARK: - Detach - 返回方式为 `<解析, GINetError>`
 extension NetProvider {
-    /// 网络请求
+    /// 网络请求 <解析, GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
@@ -87,7 +87,7 @@ extension NetProvider {
         })
     }
     
-    /// 网络请求
+    /// 网络请求 <(), GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
@@ -101,7 +101,7 @@ extension NetProvider {
 // MARK: - Docking - 返回方式为 `<(解析, BasicInfo), GINetError>`  or  `<BasicInfo, GINetError>`
 extension NetProvider {
     
-    /// 网络请求
+    /// 网络请求 <(解析, BasicInfo), GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
@@ -114,7 +114,7 @@ extension NetProvider {
         })
     }
     
-    /// 网络请求
+    /// 网络请求 <BasicInfo, GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
@@ -124,7 +124,7 @@ extension NetProvider {
         return self.docking(target, codable).map { $1 }
     }
 
-    /// 网络请求
+    /// 网络请求 <BasicInfo, GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
@@ -162,7 +162,7 @@ extension NetProvider {
     
     
     
-    /// 尝试解码2次
+    /// 尝试解码2次 <NetProvider.Engine<Engine, Second>, GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
