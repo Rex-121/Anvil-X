@@ -82,6 +82,7 @@ extension NetProvider {
     /// - Returns: 解析, GINetError
     open func detach<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<Engine, GINetError> in
+            if codable is DontCare, result.good { return Result(value: DontCare() as! Engine) }
             guard let result = result.result else { return Result(error: .ParseWrong) }
             return Result(value: result)
         })
@@ -109,6 +110,7 @@ extension NetProvider {
     /// - Returns: <(解析, BasicInfo), GINetError>
     open func docking<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
+            if codable is DontCare, result.good { return Result(value: (DontCare() as! Engine, result.info)) }
             guard let value = result.result else { return Result(error: .ParseWrong) }
             return Result(value: (value, result.info))
         })
@@ -168,7 +170,7 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - engine: 主解析，失败后采用副解析
     ///   - second: 副解析
-    /// - Returns: SignalProducer<NetProvider.Engine<Engine, Second>, GINetError>
+    /// - Returns: <NetProvider.Engine<Engine, Second>, GINetError>
     open func launch<Engine: Codable, Second: Codable>(_ target: Target, main engine: Engine.Type, second: Second.Type) -> SignalProducer<NetProvider.Engine<Engine, Second>, GINetError> {
         
         return super.reactive.request(target)
