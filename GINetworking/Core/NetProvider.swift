@@ -82,7 +82,9 @@ extension NetProvider {
     /// - Returns: 解析, GINetError
     open func detach<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<Engine, GINetError> in
-            if codable is DontCare, result.good { return Result(value: DontCare() as! Engine) }
+            print(result)
+            if result.good == false { return Result(error: result.errorInfo) }
+            if codable == DontCare.self { return Result(value: DontCare() as! Engine) }
             guard let result = result.result else { return Result(error: .ParseWrong) }
             return Result(value: result)
         })
@@ -110,7 +112,8 @@ extension NetProvider {
     /// - Returns: <(解析, BasicInfo), GINetError>
     open func docking<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
-            if codable is DontCare, result.good { return Result(value: (DontCare() as! Engine, result.info)) }
+            if result.good == false { return Result(error: result.errorInfo) }
+            if codable == DontCare.self { return Result(value: (DontCare() as! Engine, result.info)) }
             guard let value = result.result else { return Result(error: .ParseWrong) }
             return Result(value: (value, result.info))
         })
