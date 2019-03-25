@@ -27,6 +27,12 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
     
     open func go<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, MoyaError> {
         return super.reactive.request(target).map({ (response) -> GIResult<Engine> in
+            
+            switch response.statusCode {
+            case 404: return GIResult.NotFound
+            default: break
+            }
+            
             do {
                 return try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
             } catch {
