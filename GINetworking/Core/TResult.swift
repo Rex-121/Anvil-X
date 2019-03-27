@@ -47,9 +47,15 @@ public struct GIResult<Care: Codable>: Codable {
 }
 
 public struct BasicInfo: CustomStringConvertible {
+    /// 是否成功
     public let success: Bool
+    
+    /// 信息
     public let message: String?
+    
+    /// 状态码
     public let code: String?
+    
     public var description: String {
         return message ?? ""
     }

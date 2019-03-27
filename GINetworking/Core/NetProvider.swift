@@ -13,7 +13,6 @@ import ReactiveSwift
 public typealias TargetType = Moya.TargetType
 
 open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
-    
     public override init(endpointClosure: @escaping MoyaProvider<T>.EndpointClosure = MoyaProvider<T>.defaultEndpointMapping,
                          requestClosure: @escaping MoyaProvider<T>.RequestClosure = MoyaProvider<T>.defaultRequestMapping,
                          stubClosure: @escaping MoyaProvider<T>.StubClosure = MoyaProvider<T>.neverStub,
@@ -24,27 +23,6 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
         super.init(endpointClosure: endpointClosure, requestClosure: requestClosure, stubClosure: stubClosure, callbackQueue: callbackQueue, manager: manager, plugins: plugins, trackInflights: trackInflights)
         
     }
-    
-    open func go<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, MoyaError> {
-        return super.reactive.request(target).map({ (response) -> GIResult<Engine> in
-            
-            switch response.statusCode {
-            case 404: return GIResult.NotFound
-            default: break
-            }
-            
-            do {
-                return try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
-            } catch {
-                return GIResult.ParseWrong
-            }
-        })
-    }
-    
-    public func go(_ target: T) -> SignalProducer<GIResult<DontCare>, MoyaError> {
-        return self.go(target, DontCare.self)
-    }
-
 }
 
 // MARK: - Launch - 返回方式为 `<GIResult<解析>, GINetError>`
@@ -60,7 +38,9 @@ extension NetProvider {
         return super.reactive.request(target)
             .map({ (response) -> GIResult<Engine> in
                 do {
-                    return try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
+                    var result = try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
+                    if codable == DontCare.self { result.result = (DontCare() as! Engine) }
+                    return result
                 } catch {
                     return GIResult.ParseWrong
                 }
@@ -88,9 +68,8 @@ extension NetProvider {
     /// - Returns: 解析, GINetError
     open func detach<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<Engine, GINetError> in
-            print(result)
-            if result.good == false { return Result(error: result.errorInfo) }
-            if codable == DontCare.self { return Result(value: DontCare() as! Engine) }
+//            if result.good == false { return Result(error: result.errorInfo) }
+//            if codable == DontCare.self { return Result(value: DontCare() as! Engine) }
             guard let result = result.result else { return Result(error: .ParseWrong) }
             return Result(value: result)
         })
@@ -118,8 +97,8 @@ extension NetProvider {
     /// - Returns: <(解析, BasicInfo), GINetError>
     open func docking<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
-            if result.good == false { return Result(error: result.errorInfo) }
-            if codable == DontCare.self { return Result(value: (DontCare() as! Engine, result.info)) }
+//            if result.good == false { return Result(error: result.errorInfo) }
+//            if codable == DontCare.self { return Result(value: (DontCare() as! Engine, result.info)) }
             guard let value = result.result else { return Result(error: .ParseWrong) }
             return Result(value: (value, result.info))
         })
@@ -145,7 +124,6 @@ extension NetProvider {
     }
     
 }
-
 
 
 // MARK: - 主/次解析方式
@@ -204,14 +182,32 @@ extension NetProvider {
                 
         }
     }
-    
-    private func coding(_ engine: Decodable.Type, with data: Data) throws {
-    
-//        let mainEngine = try JSONDecoder().decode(engine.self, from: data)
-        
-    }
+//
+//    private func coding(_ engine: Decodable.Type, with data: Data) throws {
+//
+////        let mainEngine = try JSONDecoder().decode(engine.self, from: data)
+//
+//    }
     
 }
+
+
+extension NetProvider {
+    
+    
+    /// 网络请求 <(target, BasicInfo), GINetError>
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    /// - Returns: (网络目标, BasicInfo)
+    /// 暂时不建议使用
+    public func echo(_ target: T) -> SignalProducer<(T, BasicInfo), GINetError> {
+        return self.docking(target, DontCare.self).map { (target, $1) }
+    }
+    
+    
+}
+
 
 
 //MARK: - TargetSet
@@ -257,4 +253,40 @@ extension SignalProducer where Value: TargetSet, Error == GINetError {
                 return Result(error: GINetError.business(result.info))
         }
     }
+    
+//    func a() {
+//        return attempt({ (result) -> Result<(), GINetError> in
+//            <#code#>
+//        })
+//    }
+//    if result.good == false { return Result(error: result.errorInfo) }
+//    if codable == DontCare.self { return Result(value: (DontCare() as! Engine, result.info)) }
+}
+
+
+// MARK: - 废弃
+extension NetProvider {
+    
+    @available(*, deprecated, message: "已被完全废弃，使用 `launch`, `detacht`, `docking` 等替代")
+    open func go<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, MoyaError> {
+        return super.reactive.request(target).map({ (response) -> GIResult<Engine> in
+            
+            switch response.statusCode {
+            case 404: return GIResult.NotFound
+            default: break
+            }
+            
+            do {
+                return try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
+            } catch {
+                return GIResult.ParseWrong
+            }
+        })
+    }
+    
+    @available(*, deprecated, message: "已被完全废弃，使用 `launch`, `detacht`, `docking` 等替代")
+    public func go(_ target: T) -> SignalProducer<GIResult<DontCare>, MoyaError> {
+        return self.go(target, DontCare.self)
+    }
+    
 }
