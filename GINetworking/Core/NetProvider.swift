@@ -66,10 +66,8 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: 解析, GINetError
-    open func detach<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
+    public func detach<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<Engine, GINetError> in
-//            if result.good == false { return Result(error: result.errorInfo) }
-//            if codable == DontCare.self { return Result(value: DontCare() as! Engine) }
             guard let result = result.result else { return Result(error: .ParseWrong) }
             return Result(value: result)
         })
@@ -80,7 +78,7 @@ extension NetProvider {
     /// - Parameters:
     ///   - target: 网络目标
     /// - Returns: (), GINetError
-    open func detach(_ target: T) -> SignalProducer<(), GINetError> {
+    public func detach(_ target: T) -> SignalProducer<(), GINetError> {
         return self.detach(target, DontCare.self).map { _ in () }
     }
     
@@ -95,10 +93,9 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: <(解析, BasicInfo), GINetError>
-    open func docking<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
+    @available(*, deprecated, message: "`dock` 关键词让行，请使用 `brief` 相应方法")
+    public func docking<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
-//            if result.good == false { return Result(error: result.errorInfo) }
-//            if codable == DontCare.self { return Result(value: (DontCare() as! Engine, result.info)) }
             guard let value = result.result else { return Result(error: .ParseWrong) }
             return Result(value: (value, result.info))
         })
@@ -110,7 +107,8 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: <BasicInfo, GINetError>
-    open func docked<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<BasicInfo, GINetError> {
+    @available(*, deprecated, message: "`dock` 关键词让行，请使用 `brief` 相应方法")
+    public func docked<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<BasicInfo, GINetError> {
         return self.docking(target, codable).map { $1 }
     }
 
@@ -119,7 +117,45 @@ extension NetProvider {
     /// - Parameters:
     ///   - target: 网络目标
     /// - Returns: <BasicInfo, GINetError>
-    open func docked(_ target: T) -> SignalProducer<BasicInfo, GINetError> {
+    @available(*, deprecated, message: "`dock` 关键词让行，请使用 `brief` 相应方法")
+    public func docked(_ target: T) -> SignalProducer<BasicInfo, GINetError> {
+        return self.docking(target, DontCare.self).map { $1 }
+    }
+    
+}
+
+// MARK: - Brief - 返回方式为 `<(解析, BasicInfo), GINetError>`  or  `<BasicInfo, GINetError>`
+extension NetProvider {
+    
+    /// 网络请求 <(解析, BasicInfo), GINetError>
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    ///   - codable: 解析方式
+    /// - Returns: <(解析, BasicInfo), GINetError>
+    public func briefing<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
+        return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
+            guard let value = result.result else { return Result(error: .ParseWrong) }
+            return Result(value: (value, result.info))
+        })
+    }
+    
+    /// 网络请求 <BasicInfo, GINetError>
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    ///   - codable: 解析方式
+    /// - Returns: <BasicInfo, GINetError>
+    public func brief<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<BasicInfo, GINetError> {
+        return self.docking(target, codable).map { $1 }
+    }
+    
+    /// 网络请求 <BasicInfo, GINetError>
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    /// - Returns: <BasicInfo, GINetError>
+    public func brief(_ target: T) -> SignalProducer<BasicInfo, GINetError> {
         return self.docking(target, DontCare.self).map { $1 }
     }
     
@@ -253,14 +289,7 @@ extension SignalProducer where Value: TargetSet, Error == GINetError {
                 return Result(error: GINetError.business(result.info))
         }
     }
-    
-//    func a() {
-//        return attempt({ (result) -> Result<(), GINetError> in
-//            <#code#>
-//        })
-//    }
-//    if result.good == false { return Result(error: result.errorInfo) }
-//    if codable == DontCare.self { return Result(value: (DontCare() as! Engine, result.info)) }
+
 }
 
 
