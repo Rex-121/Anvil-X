@@ -47,7 +47,7 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
   
-  s.dependency 'Moya/ReactiveSwift'
+  s.dependency 'Moya/ReactiveSwift', '~> 13.0.0'
   s.dependency 'XKit'
   
 end
