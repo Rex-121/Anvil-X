@@ -34,7 +34,7 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: GIResult<解析>, GINetError
-    open func launch<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, GINetError> {
+    open func launch<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, GINetError> {
         return super.reactive.request(target)
             .map({ (response) -> GIResult<Engine> in
                 do {
@@ -66,7 +66,7 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: 解析, GINetError
-    public func detach<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
+    public func detach<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<Engine, GINetError> in
             guard let result = result.result else { return Result(error: .ParseWrong) }
             return Result(value: result)
@@ -94,7 +94,7 @@ extension NetProvider {
     ///   - codable: 解析方式
     /// - Returns: <(解析, BasicInfo), GINetError>
     @available(*, deprecated, message: "`dock` 关键词让行，请使用 `brief` 相应方法")
-    public func docking<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
+    public func docking<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
             guard let value = result.result else { return Result(error: .ParseWrong) }
             return Result(value: (value, result.info))
@@ -108,7 +108,7 @@ extension NetProvider {
     ///   - codable: 解析方式
     /// - Returns: <BasicInfo, GINetError>
     @available(*, deprecated, message: "`dock` 关键词让行，请使用 `brief` 相应方法")
-    public func docked<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<BasicInfo, GINetError> {
+    public func docked<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<BasicInfo, GINetError> {
         return self.docking(target, codable).map { $1 }
     }
 
@@ -133,7 +133,7 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: <(解析, BasicInfo), GINetError>
-    public func briefing<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
+    public func briefing<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
             guard let value = result.result else { return Result(error: .ParseWrong) }
             return Result(value: (value, result.info))
@@ -146,7 +146,7 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: <BasicInfo, GINetError>
-    public func brief<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<BasicInfo, GINetError> {
+    public func brief<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<BasicInfo, GINetError> {
         return self.docking(target, codable).map { $1 }
     }
     
@@ -169,15 +169,15 @@ extension NetProvider {
     ///
     /// - main: 首要解析方式
     /// - second: 次要解析方式
-    public enum Engine<Main: Codable, Second: Codable>: Codable {
+    public enum Engine<Main: Decodable, Second: Decodable>: Decodable {
         case main(Main), second(Second)
         
-        public func encode(to encoder: Encoder) throws {
-            switch self {
-            case let .main(main): try main.encode(to: encoder)
-            case let .second(second): try second.encode(to: encoder)
-            }
-        }
+//        public func encode(to encoder: Encoder) throws {
+//            switch self {
+//            case let .main(main): try main.encode(to: encoder)
+//            case let .second(second): try second.encode(to: encoder)
+//            }
+//        }
 
         public init(from decoder: Decoder) throws {
             self = Engine<DontCare, DontCare>.main(DontCare()) as! NetProvider<T>.Engine<Main, Second>
@@ -194,7 +194,7 @@ extension NetProvider {
     ///   - engine: 主解析，失败后采用副解析
     ///   - second: 副解析
     /// - Returns: <NetProvider.Engine<Engine, Second>, GINetError>
-    open func launch<Engine: Codable, Second: Codable>(_ target: Target, main engine: Engine.Type, second: Second.Type) -> SignalProducer<NetProvider.Engine<Engine, Second>, GINetError> {
+    open func launch<Engine: Decodable, Second: Decodable>(_ target: Target, main engine: Engine.Type, second: Second.Type) -> SignalProducer<NetProvider.Engine<Engine, Second>, GINetError> {
         
         return super.reactive.request(target)
             .parachute()
@@ -250,7 +250,7 @@ extension NetProvider {
 
 fileprivate protocol TargetSet {
     var pass: Bool { get }
-    var fianl: Codable? { get }
+    var fianl: Decodable? { get }
     var info: BasicInfo { get }
 }
 
@@ -259,7 +259,7 @@ extension GIResult: TargetSet {
         return self.good
     }
     
-    var fianl: Codable? {
+    var fianl: Decodable? {
         return self.result
     }
 }
@@ -297,7 +297,7 @@ extension SignalProducer where Value: TargetSet, Error == GINetError {
 extension NetProvider {
     
     @available(*, deprecated, message: "已被完全废弃，使用 `launch`, `detacht`, `docking` 等替代")
-    open func go<Engine: Codable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, MoyaError> {
+    open func go<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, MoyaError> {
         return super.reactive.request(target).map({ (response) -> GIResult<Engine> in
             
             switch response.statusCode {

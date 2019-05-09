@@ -14,7 +14,7 @@ extension Dictionary where Value == String, Key == String {
 
 public struct DontCare: Codable { }
 
-public struct GIResult<Care: Codable>: Codable {
+public struct GIResult<Care: Decodable>: Decodable {
     
     /// 解析的结构
     public var result: Care?
