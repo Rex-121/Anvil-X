@@ -23,7 +23,7 @@ public struct GIResult<Care: Decodable>: Decodable {
     public let message: String?
     
     ///请求码
-    public let code: String?
+    public let code: Int?
     
     ///请求状态
 //    public let status: String?
@@ -31,7 +31,7 @@ public struct GIResult<Care: Decodable>: Decodable {
     public let good: Bool
     
     private enum CodingKeys: String, CodingKey {
-        case result = "obj", code, message = "msg", good = "success"
+        case result = "data", code, message, good = "success"
     }
     
     /// 是否成功，后台信息
@@ -54,7 +54,7 @@ public struct BasicInfo: CustomStringConvertible {
     public let message: String?
     
     /// 状态码
-    public let code: String?
+    public let code: Int?
     
     public var description: String {
         return message ?? ""
@@ -63,11 +63,11 @@ public struct BasicInfo: CustomStringConvertible {
 
 extension GIResult {
     public static var ParseWrong: GIResult {
-        return GIResult(result: nil, message: "解析错误", code: "-999", good: false)
+        return GIResult(result: nil, message: "解析错误", code: -999, good: false)
     }
     
     public static var NotFound: GIResult {
-        return GIResult(result: nil, message: "无法连接到服务器", code: "404", good: false)
+        return GIResult(result: nil, message: "无法连接到服务器", code: 404, good: false)
     }
 }
 
@@ -78,7 +78,7 @@ public enum GINetError: Error, CustomStringConvertible {
     
     /// 解析错误
     public static var ParseWrong: GINetError {
-        return .business(BasicInfo(success: false, message: "解析错误", code: "-999"))
+        return .business(BasicInfo(success: false, message: "解析错误", code: -999))
     }
     
     
@@ -89,7 +89,7 @@ public enum GINetError: Error, CustomStringConvertible {
     ///   - success: 是否成功 默认为 false
     ///   - code: 错误码 默认为 -1740
     /// - Returns: 业务错误
-    public static func at<B: CustomStringConvertible>(business: B?, _ success: Bool = false, _ code: String = "-1740") -> GINetError {
+    public static func at<B: CustomStringConvertible>(business: B?, _ success: Bool = false, _ code: Int = -1740) -> GINetError {
         return .business(BasicInfo(success: success, message: business?.description, code: code))
     }
 
