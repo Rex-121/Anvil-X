@@ -71,7 +71,7 @@ public extension GI_NetworkingSession {
     }
     
     
-    public static func defaultPolicy() -> ServerTrustPolicyManager? { return ServerTrustPolicyManager(policies: ["test.dcpay.vip":.disableEvaluation]) }
+    public static func defaultPolicy() -> ServerTrustPolicyManager? { return ServerTrustPolicyManager(policies: ["test.dcpay.vip":.disableEvaluation, "www.dcpay.vip":.disableEvaluation]) }
     
     
     
