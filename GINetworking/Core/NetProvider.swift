@@ -34,11 +34,11 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: GIResult<解析>, GINetError
-    open func launch<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<GIResult<Engine>, GINetError> {
+    open func launch<Engine>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<GIResult<Engine>, GINetError> where Engine: Decodable {
         return super.reactive.request(target)
             .map({ (response) -> GIResult<Engine> in
                 do {
-                    var result = try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
+                    var result = try decoder.decode(GIResult<Engine>.self, from: response.data)
                     if codable == DontCare.self { result.result = (DontCare() as! Engine) }
                     return result
                 } catch {
