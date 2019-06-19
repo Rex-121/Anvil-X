@@ -13,7 +13,13 @@ public struct Failable<Value : Decodable> : Decodable {
     
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
-        self.value = try? container.decode(Value.self)
+        do {
+        self.value = try container.decode(Value.self)
+        }
+        catch {
+            print(error)
+            self.value = nil
+        }
     }
 }
 
