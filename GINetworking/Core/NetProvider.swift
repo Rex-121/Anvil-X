@@ -272,7 +272,7 @@ extension SignalProducer where Error == MoyaError {
     ///
     /// - Returns: SignalProducer<Value, GINetError>
     func parachute() -> SignalProducer<Value, GINetError> {
-        return mapError { GINetError.network($0.localizedDescription, $0.response) }
+        return mapError { GINetError.network("网络异常", $0.response) }
     }
     
 }
