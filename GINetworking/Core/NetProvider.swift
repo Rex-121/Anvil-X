@@ -29,7 +29,7 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
 extension NetProvider {
     
     
-    fileprivate func transform<Engine>(_ decodable: Engine.Type, _ decoder: JSONDecoder/* = JSONDecoder()*/) -> (Response) -> GIResult<Engine> {
+    public func transform<Engine>(_ decodable: Engine.Type, _ decoder: JSONDecoder/* = JSONDecoder()*/) -> (Response) -> GIResult<Engine> {
         return { (response) -> GIResult<Engine> in
             do {
                 var result = try decoder.decode(GIResult<Engine>.self, from: response.data)
