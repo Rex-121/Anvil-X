@@ -28,23 +28,38 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
 // MARK: - Launch - 返回方式为 `<GIResult<解析>, GINetError>`
 extension NetProvider {
     
+    
+    fileprivate func transform<Engine>(_ decodable: Engine.Type, _ decoder: JSONDecoder/* = JSONDecoder()*/) -> (Response) -> GIResult<Engine> {
+        return { (response) -> GIResult<Engine> in
+            do {
+                var result = try decoder.decode(GIResult<Engine>.self, from: response.data)
+                if decodable == DontCare.self { result.result = (DontCare() as! Engine) }
+                return result
+            } catch {
+                return GIResult.ParseWrong
+            }
+        }
+    }
+    
     /// 网络请求 <GIResult<解析>, GINetError>
     ///
     /// - Parameters:
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: GIResult<解析>, GINetError
-    open func launch<Engine>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<GIResult<Engine>, GINetError> where Engine: Decodable {
+    open func launch<Engine>(_ target: T, _ decodable: Engine.Type, _ decoder: JSONDecoder/* = JSONDecoder()*/) -> SignalProducer<GIResult<Engine>, GINetError> where Engine: Decodable {
         return super.reactive.request(target)
-            .map({ (response) -> GIResult<Engine> in
-                do {
-                    var result = try decoder.decode(GIResult<Engine>.self, from: response.data)
-                    if codable == DontCare.self { result.result = (DontCare() as! Engine) }
-                    return result
-                } catch {
-                    return GIResult.ParseWrong
-                }
-            }).parachute().land()
+            .map(transform(decodable, decoder))
+//            .map({ (response) -> GIResult<Engine> in
+//                do {
+//                    var result = try decoder.decode(GIResult<Engine>.self, from: response.data)
+//                    if codable == DontCare.self { result.result = (DontCare() as! Engine) }
+//                    return result
+//                } catch {
+//                    return GIResult.ParseWrong
+//                }
+//            })
+            .parachute().land()
     }
     
     /// 网络请求 <GIResult<DontCare>, GINetError>
@@ -52,8 +67,8 @@ extension NetProvider {
     /// - Parameters:
     ///   - target: 网络目标
     /// - Returns: GIResult<DontCare>, GINetError
-    open func launch(_ target: T) -> SignalProducer<GIResult<DontCare>, GINetError> {
-        return self.launch(target, DontCare.self)
+    open func launch(_ target: T,  _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<GIResult<DontCare>, GINetError> {
+        return self.launch(target, DontCare.self, decoder)
     }
     
 }
@@ -66,8 +81,8 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: 解析, GINetError
-    public func detach<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<Engine, GINetError> {
-        return self.launch(target, codable).attemptMap({ (result) -> Result<Engine, GINetError> in
+    public func detach<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<Engine, GINetError> {
+        return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<Engine, GINetError> in
             guard let result = result.result else { return Result(error: .ParseWrong) }
             return Result(value: result)
         })
@@ -94,8 +109,8 @@ extension NetProvider {
     ///   - codable: 解析方式
     /// - Returns: <(解析, BasicInfo), GINetError>
     @available(*, deprecated, message: "`dock` 关键词让行，请使用 `brief` 相应方法")
-    public func docking<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
-        return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
+    public func docking<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<(Engine, BasicInfo), GINetError> {
+        return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
             guard let value = result.result else { return Result(error: .ParseWrong) }
             return Result(value: (value, result.info))
         })
@@ -133,8 +148,8 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: <(解析, BasicInfo), GINetError>
-    public func briefing<Engine: Decodable>(_ target: T, _ codable: Engine.Type) -> SignalProducer<(Engine, BasicInfo), GINetError> {
-        return self.launch(target, codable).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
+    public func briefing<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<(Engine, BasicInfo), GINetError> {
+        return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
             guard let value = result.result else { return Result(error: .ParseWrong) }
             return Result(value: (value, result.info))
         })
@@ -171,13 +186,6 @@ extension NetProvider {
     /// - second: 次要解析方式
     public enum Engine<Main: Decodable, Second: Decodable>: Decodable {
         case main(Main), second(Second)
-        
-//        public func encode(to encoder: Encoder) throws {
-//            switch self {
-//            case let .main(main): try main.encode(to: encoder)
-//            case let .second(second): try second.encode(to: encoder)
-//            }
-//        }
 
         public init(from decoder: Decoder) throws {
             self = Engine<DontCare, DontCare>.main(DontCare()) as! NetProvider<T>.Engine<Main, Second>
@@ -218,12 +226,14 @@ extension NetProvider {
                 
         }
     }
-//
-//    private func coding(_ engine: Decodable.Type, with data: Data) throws {
-//
-////        let mainEngine = try JSONDecoder().decode(engine.self, from: data)
-//
-//    }
+
+}
+
+extension NetProvider {
+    
+    public func progressed(_ target: Target) -> SignalProducer<ProgressResponse, GINetError> {
+        return reactive.requestWithProgress(target).parachute()
+    }
     
 }
 
@@ -242,7 +252,24 @@ extension NetProvider {
     }
     
     
+    public struct EchoSidesError<T>: Error {
+        let target: T
+        let error: GINetError
+    }
+   
+    /// 网络请求 <(target, BasicInfo), (target, GINetError)>
+    ///
+    /// - Parameters:
+    ///   - target: 网络目标
+    /// - Returns: (网络目标, BasicInfo)
+    /// 暂时不建议使用
+//    public func echoSidesError(_ target: T, ) -> SignalProducer<(T, BasicInfo), EchoSidesError<T>> {
+//        return self.detach(target, <#T##codable: Decodable.Protocol##Decodable.Protocol#>)(target, DontCare.self).map { (target, $1) }.mapError { EchoSidesError.init(target: target, error: $0) }
+//    }
+    
 }
+
+
 
 
 
@@ -272,6 +299,30 @@ extension SignalProducer where Error == MoyaError {
     ///
     /// - Returns: SignalProducer<Value, GINetError>
     func parachute() -> SignalProducer<Value, GINetError> {
+//        mapError { (my) -> GINetError in
+//
+//            switch my {
+//
+//            case let .imageMapping(g):
+//                g.
+//            case .jsonMapping(_):
+//                <#code#>
+//            case .stringMapping(_):
+//                <#code#>
+//            case .objectMapping(_, _):
+//                <#code#>
+//            case .encodableMapping(_):
+//                <#code#>
+//            case .statusCode(_):
+//                <#code#>
+//            case .underlying(_, _):
+//                <#code#>
+//            case .requestMapping(_):
+//                <#code#>
+//            case .parameterEncoding(_):
+//                <#code#>
+//            }
+//        }
         return mapError { GINetError.network("网络异常", $0.response) }
     }
     
