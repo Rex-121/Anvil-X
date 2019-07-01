@@ -299,31 +299,28 @@ extension SignalProducer where Error == MoyaError {
     ///
     /// - Returns: SignalProducer<Value, GINetError>
     func parachute() -> SignalProducer<Value, GINetError> {
-//        mapError { (my) -> GINetError in
-//
-//            switch my {
-//
-//            case let .imageMapping(g):
-//                g.
-//            case .jsonMapping(_):
-//                <#code#>
-//            case .stringMapping(_):
-//                <#code#>
-//            case .objectMapping(_, _):
-//                <#code#>
-//            case .encodableMapping(_):
-//                <#code#>
-//            case .statusCode(_):
-//                <#code#>
-//            case .underlying(_, _):
-//                <#code#>
-//            case .requestMapping(_):
-//                <#code#>
-//            case .parameterEncoding(_):
-//                <#code#>
-//            }
-//        }
-        return mapError { GINetError.network("网络异常", $0.response) }
+        
+        return mapError { (my) -> GINetError in
+            
+            print(my)
+            
+            var msg = "网络异常"
+            
+            if let res = my.response {
+                return .network("\(msg) '\(res.statusCode)'", res)
+            }
+            
+            switch my {
+            case .imageMapping, .jsonMapping, .stringMapping(_), .objectMapping(_, _), .encodableMapping(_),
+                 .parameterEncoding, .requestMapping:
+                break
+            case .statusCode(let a):
+                msg = "\(msg) '\(a.statusCode)'"
+            case .underlying(_, _):
+                msg = "无法连接到服务器"
+            }
+            return .network(msg, my.response)
+        }
     }
     
 }
