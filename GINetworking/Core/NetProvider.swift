@@ -308,7 +308,7 @@ extension SignalProducer where Error == MoyaError {
             
             print(my)
             
-            var msg = "网络异常"
+            var msg = "您的网络不稳定，请更换网络环境并尝试"
             
             if let res = my.response {
                 return .network("\(msg) '\(res.statusCode)'", res)
