@@ -36,6 +36,10 @@ extension NetProvider {
                 if decodable == DontCare.self { result.result = (DontCare() as! Engine) }
                 return result
             } catch {
+                //FIXME: 临时
+                if response.statusCode != 200 {
+                    return GIResult(result: nil, message: "网络错误 \(response.statusCode)", code: response.statusCode, good: false)
+                }
                 return GIResult.ParseWrong
             }
         }
