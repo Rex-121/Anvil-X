@@ -35,10 +35,14 @@ extension NetProvider {
                 var result = try decoder.decode(GIResult<Engine>.self, from: response.data)
                 if decodable == DontCare.self { result.result = (DontCare() as! Engine) }
                 return result
-            } catch {
+            }
+            catch {
                 //FIXME: 临时
                 if response.statusCode != 200 {
                     return GIResult(result: nil, message: "网络错误 \(response.statusCode)", code: response.statusCode, good: false)
+                }
+                if let e = error as? ReError {
+                    return GIResult(result: nil, message: e.message, code: e.code, good: false)
                 }
                 return GIResult.ParseWrong
             }

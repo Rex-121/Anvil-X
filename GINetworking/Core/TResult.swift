@@ -41,6 +41,40 @@ public struct GIResult<Care: Decodable>: Decodable {
         return .business(info)
     }
     
+    public init(result: Care?, message: String?, code: Int?, good: Bool) {
+        self.result = result
+        self.message = message
+        self.code = code
+        self.good = good
+    }
+    
+   
+    
+    
+    public init(from decoder: Decoder) throws {
+        
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        
+        good = try container.decode(Bool.self, forKey: .good)
+        
+        message = try container.decodeIfPresent(String.self, forKey: .message)
+        
+        code = try container.decodeIfPresent(Int.self, forKey: .code)
+        
+        if !good {
+            throw ReError(message: message, code: code)
+        }
+        
+        result = try container.decodeIfPresent(Care.self, forKey: .good)
+        
+        
+        
+    }
+}
+
+struct ReError: Error {
+    let message: String?
+    let code: Int?
 }
 
 public struct BasicInfo: CustomStringConvertible {
