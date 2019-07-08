@@ -65,7 +65,7 @@ public struct GIResult<Care: Decodable>: Decodable {
             throw ReError(message: message, code: code)
         }
         
-        result = try container.decodeIfPresent(Care.self, forKey: .good)
+        result = try container.decodeIfPresent(Care.self, forKey: .result)
         
         
         
