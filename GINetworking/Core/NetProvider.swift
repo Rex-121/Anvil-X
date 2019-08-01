@@ -7,7 +7,6 @@
 
 import Moya
 
-import enum Result.Result
 import ReactiveSwift
 
 public typealias TargetType = Moya.TargetType
@@ -91,8 +90,8 @@ extension NetProvider {
     /// - Returns: 解析, GINetError
     public func detach<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<Engine, GINetError> {
         return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<Engine, GINetError> in
-            guard let result = result.result else { return Result(error: .ParseWrong) }
-            return Result(value: result)
+            guard let result = result.result else { return Result(failure: .ParseWrong) }
+            return Result(success: result)
         })
     }
     
@@ -119,8 +118,8 @@ extension NetProvider {
     @available(*, deprecated, message: "`dock` 关键词让行，请使用 `brief` 相应方法")
     public func docking<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
-            guard let value = result.result else { return Result(error: .ParseWrong) }
-            return Result(value: (value, result.info))
+            guard let value = result.result else { return Result(failure: .ParseWrong) }
+            return Result(success: (value, result.info))
         })
     }
     
@@ -158,8 +157,8 @@ extension NetProvider {
     /// - Returns: <(解析, BasicInfo), GINetError>
     public func briefing<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
-            guard let value = result.result else { return Result(error: .ParseWrong) }
-            return Result(value: (value, result.info))
+            guard let value = result.result else { return Result(failure: .ParseWrong) }
+            return Result(success: (value, result.info))
         })
     }
     
@@ -218,17 +217,17 @@ extension NetProvider {
                 
                 do {
                     let mainEngine = try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
-                    if mainEngine.good == false { return Result(error: mainEngine.errorInfo) }
-                    if let res = mainEngine.result { return Result(value: .main(res)) }
+                    if mainEngine.good == false { return Result(failure: mainEngine.errorInfo) }
+                    if let res = mainEngine.result { return Result(success: .main(res)) }
                     throw GINetError.ParseWrong
                 }
                 catch {
                     do {
                         let secondEngine = try JSONDecoder().decode(GIResult<Second>.self, from: response.data)
                         guard let res = secondEngine.result else { throw GINetError.ParseWrong }
-                        return Result(value: .second(res))
+                        return Result(success: .second(res))
                     } catch {
-                        return Result(error: GINetError.ParseWrong)
+                        return Result(failure: GINetError.ParseWrong)
                     }
                 }
                 
@@ -341,8 +340,8 @@ extension SignalProducer where Value: TargetSet, Error == GINetError {
     /// - Returns: SignalProducer<Value, GINetError>
     func land() -> SignalProducer<Value, GINetError> {
         return attempt { (result) -> Result<(), GINetError> in
-                if result.pass { return Result(()) }
-                return Result(error: GINetError.business(result.info))
+                if result.pass { return Result(success: ()) }
+                return Result(failure: GINetError.business(result.info))
         }
     }
 
