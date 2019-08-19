@@ -88,6 +88,13 @@ public struct BasicInfo: CustomStringConvertible {
     public let code: Int?
     
     public var description: String {
+        
+        switch code {
+        case 1111, 1211: return "账号或密码错误，请重新输入"
+        case 1311: return "验证码错误请重新获取"
+        default: break
+        }
+
         return message ?? ""
     }
 }
@@ -127,7 +134,7 @@ public enum GINetError: Error, CustomStringConvertible {
     /// 原始的信息
     private var message: String? {
         switch self {
-        case .business(let info): return info.message
+        case .business(let info): return info.description
         case .network(let info, _): return info
         }
     }

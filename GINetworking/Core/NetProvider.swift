@@ -286,11 +286,17 @@ fileprivate protocol TargetSet {
     var pass: Bool { get }
     var fianl: Decodable? { get }
     var info: BasicInfo { get }
+    
+    var code_p: Int? { get }
 }
 
 extension GIResult: TargetSet {
     var pass: Bool {
         return self.good
+    }
+    
+    var code_p: Int? {
+        return self.code
     }
     
     var fianl: Decodable? {
@@ -340,8 +346,13 @@ extension SignalProducer where Value: TargetSet, Error == GINetError {
     /// - Returns: SignalProducer<Value, GINetError>
     func land() -> SignalProducer<Value, GINetError> {
         return attempt { (result) -> Result<(), GINetError> in
-                if result.pass { return Result(success: ()) }
-                return Result(failure: GINetError.business(result.info))
+            if result.pass { return Result(success: ()) }
+            switch result.code_p {
+            case -1004, -1003, -1006, -1001, 310, 500, 502, 404:
+                return Result(success: ())
+            default: break
+            }
+            return Result(failure: GINetError.business(result.info))
         }
     }
 
