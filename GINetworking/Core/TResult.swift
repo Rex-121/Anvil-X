@@ -97,6 +97,12 @@ public struct BasicInfo: CustomStringConvertible {
 
         return message ?? ""
     }
+    
+    public init(success: Bool, message: String?, code: Int?) {
+        self.success = success
+        self.message = message
+        self.code = code
+    }
 }
 
 extension GIResult {
