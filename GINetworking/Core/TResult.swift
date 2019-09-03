@@ -27,8 +27,11 @@ public struct GIResult<Care: Decodable>: Decodable {
     
     public let good: Bool
     
+    /// 是否可能是网络原因
+    let supposeWrongAtNet: Bool
+    
     private enum CodingKeys: String, CodingKey {
-        case result = "data", code, message, good = "success"
+        case result = "data", code, message, good = "success", supposeWrongAtNet
     }
     
     /// 是否成功，后台信息
@@ -41,13 +44,32 @@ public struct GIResult<Care: Decodable>: Decodable {
         return .business(info)
     }
     
+    
+    /// 此方法库外可见，不允许设置为网络错误
+    ///
+    /// - Parameters:
+    ///   - result: 结果
+    ///   - message: 信息
+    ///   - code: 请求吗
+    ///   - good: 是否成功
     public init(result: Care?, message: String?, code: Int?, good: Bool) {
+        self.init(result: result, message: message, code: code, good: good, wrongAtNet: false)
+//        self.result = result
+//        self.message = message
+//        self.code = code
+//        self.good = good
+//        self.supposeWrongAtNet = false
+//
+    }
+    
+    
+    init(result: Care?, message: String?, code: Int?, good: Bool, wrongAtNet: Bool) {
         self.result = result
         self.message = message
         self.code = code
         self.good = good
+        self.supposeWrongAtNet = wrongAtNet
     }
-    
    
     
     
@@ -67,8 +89,7 @@ public struct GIResult<Care: Decodable>: Decodable {
         
         result = try container.decodeIfPresent(Care.self, forKey: .result)
         
-        
-        
+        supposeWrongAtNet = try container.decodeIfPresent(Bool.self, forKey: .supposeWrongAtNet) ?? false
     }
 }
 

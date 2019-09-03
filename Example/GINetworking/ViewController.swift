@@ -30,15 +30,9 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        n.go(.appVersion, GIVersion.self).startWithResult { (result) in
+        n.detach(.version, GIVersion.self).startWithResult({ (result) in
             print(result)
-        }
-        
-        n.go(.appVersion).startWithResult { (result) in
-            print(result)
-        }
-
+        })
         
     }
 
@@ -49,45 +43,34 @@ class ViewController: UIViewController {
 
 }
 
-enum NetBusiness {
-    case validate(String, String), issueCoin, login(String, String), appVersion
-}
-
-
-
-extension TargetType {
-    var baseURL: URL { return URL(string: "https://www.6xhtt.com/app/api")! }
-    var headers: [String : String]? { return nil }
-}
-
-extension NetBusiness: TargetType {
-    public var path: String {
-        switch self {
-        case .validate(_, _): return "/user/loginValidate"
-        case .issueCoin: return "/newc2c/issuedCoin"
-        case .login(_, _): return "/user/login"
-        case .appVersion: return "/index/getAppVersion"
-        }
+enum NetBusiness: TargetType {
+    
+    case version
+    
+    var baseURL: URL {
+        return URL(string: "https://tcapp.dcpay.vip/merchant_app")!
     }
-    public var method: Moya.Method {
-        switch self {
-        case .validate(_, _), .login(_, _), .appVersion: return .post
-        case .issueCoin: return .get
-        }
+    
+    var path: String {
+        return "/app/version/list"
     }
-
-    public var sampleData: Data {
+    
+    var method: Moya.Method {
+        return .post
+    }
+    
+    var sampleData: Data {
         return Data()
     }
-
-    public var task: Task {
-        switch self {
-
-        case .validate(let n, let p): return .uploadMultipart(["username":n, "password":p].multipartData())
-        case .issueCoin:              return .requestPlain
-        case .login(let n, let p):    return .uploadMultipart(["username":n, "password":p].multipartData())
-        case .appVersion:             return .requestPlain
-        }
+    
+    var task: Task {
+        let a = MultipartFormData(provider: MultipartFormData.FormDataProvider.data("4".data(using: .utf8)!), name: "type")
+        return .uploadMultipart([a])
     }
-
+    
+    var headers: [String : String]? {
+        return nil
+    }
+    
+    
 }

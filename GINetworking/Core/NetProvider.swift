@@ -38,7 +38,7 @@ extension NetProvider {
             catch {
                 //FIXME: 临时
                 if response.statusCode != 200 {
-                    return GIResult(result: nil, message: "网络错误 \(response.statusCode)", code: response.statusCode, good: false)
+                    return GIResult(result: nil, message: "网络错误 \(response.statusCode)", code: response.statusCode, good: false, wrongAtNet: true)
                 }
                 if let e = error as? ReError {
                     return GIResult(result: nil, message: e.message, code: e.code, good: false)
@@ -286,13 +286,17 @@ fileprivate protocol TargetSet {
     var pass: Bool { get }
     var fianl: Decodable? { get }
     var info: BasicInfo { get }
-    
+    var wrongNet: Bool { get }
     var code_p: Int? { get }
 }
 
 extension GIResult: TargetSet {
     var pass: Bool {
         return self.good
+    }
+    
+    var wrongNet: Bool {
+        return self.supposeWrongAtNet
     }
     
     var code_p: Int? {
@@ -347,12 +351,12 @@ extension SignalProducer where Value: TargetSet, Error == GINetError {
     func land() -> SignalProducer<Value, GINetError> {
         return attempt { (result) -> Result<(), GINetError> in
             if result.pass { return Result(success: ()) }
-            switch result.code_p {
-            case -1004, -1003, -1006, -1001, 310, 500, 502, 404:
-                return Result(success: ())
-            default: break
+            if result.wrongNet {
+                return Result(failure: .network(result.info.message ?? "", nil))
             }
-            return Result(failure: GINetError.business(result.info))
+            else {
+                return Result(failure: .business(result.info))
+            }
         }
     }
 
