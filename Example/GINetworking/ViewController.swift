@@ -14,25 +14,20 @@ import Moya
 
 class ViewController: UIViewController {
     
-    struct GIVersion: Codable {
-        let id: Int?
-        let versionCode: String?
-        let leastVersion: String?
-        let versionName: String
-        let updateInformation: String?
-        let phoneType: Int?
-        let downloadAddress: URL
-        let isUpdate: Int
-    }
+    
 
     let n = NetProvider<NetBusiness>()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        n.detach(.version, GIVersion.self).startWithResult({ (result) in
-            print(result)
-        })
+//        n.detach(.version, SampleVersion.self).startWithResult({ (result) in
+//            print(result)
+//        })
+//        
+//        n.detach(.version, SampleVersionWrong.self).startWithResult({ (result) in
+//            print(result)
+//        })
         
     }
 
@@ -43,34 +38,3 @@ class ViewController: UIViewController {
 
 }
 
-enum NetBusiness: TargetType {
-    
-    case version
-    
-    var baseURL: URL {
-        return URL(string: "https://tcapp.dcpay.vip/merchant_app")!
-    }
-    
-    var path: String {
-        return "/app/version/list"
-    }
-    
-    var method: Moya.Method {
-        return .post
-    }
-    
-    var sampleData: Data {
-        return Data()
-    }
-    
-    var task: Task {
-        let a = MultipartFormData(provider: MultipartFormData.FormDataProvider.data("4".data(using: .utf8)!), name: "type")
-        return .uploadMultipart([a])
-    }
-    
-    var headers: [String : String]? {
-        return nil
-    }
-    
-    
-}

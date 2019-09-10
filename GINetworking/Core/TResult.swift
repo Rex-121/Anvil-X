@@ -27,11 +27,8 @@ public struct GIResult<Care: Decodable>: Decodable {
     
     public let good: Bool
     
-    /// 是否可能是网络原因
-    let supposeWrongAtNet: Bool
-    
     private enum CodingKeys: String, CodingKey {
-        case result = "data", code, message, good = "success", supposeWrongAtNet
+        case result = "data", code, message, good = "success"
     }
     
     /// 是否成功，后台信息
@@ -53,22 +50,10 @@ public struct GIResult<Care: Decodable>: Decodable {
     ///   - code: 请求吗
     ///   - good: 是否成功
     public init(result: Care?, message: String?, code: Int?, good: Bool) {
-        self.init(result: result, message: message, code: code, good: good, wrongAtNet: false)
-//        self.result = result
-//        self.message = message
-//        self.code = code
-//        self.good = good
-//        self.supposeWrongAtNet = false
-//
-    }
-    
-    
-    init(result: Care?, message: String?, code: Int?, good: Bool, wrongAtNet: Bool) {
         self.result = result
         self.message = message
         self.code = code
         self.good = good
-        self.supposeWrongAtNet = wrongAtNet
     }
    
     
@@ -83,13 +68,12 @@ public struct GIResult<Care: Decodable>: Decodable {
         
         code = try container.decodeIfPresent(Int.self, forKey: .code)
         
-        if !good {
-            throw ReError(message: message, code: code)
+        if Care.self == DontCare.self {
+            result = DontCare() as? Care
         }
-        
-        result = try container.decodeIfPresent(Care.self, forKey: .result)
-        
-        supposeWrongAtNet = try container.decodeIfPresent(Bool.self, forKey: .supposeWrongAtNet) ?? false
+        else {
+            result = try container.decodeIfPresent(Care.self, forKey: .result)
+        }
     }
 }
 
@@ -128,22 +112,19 @@ public struct BasicInfo: CustomStringConvertible {
 
 extension GIResult {
     public static var ParseWrong: GIResult {
-        return GIResult(result: nil, message: "解析错误", code: -999, good: false)
-    }
-    
-    public static var NotFound: GIResult {
-        return GIResult(result: nil, message: "无法连接到服务器", code: 404, good: false)
+        return GIResult(result: nil, message: "数据错误", code: -999, good: false)
     }
 }
 
 
 public enum GINetError: Error, CustomStringConvertible {
+    
     case business(BasicInfo), network(String, Response?)
     
     
     /// 解析错误
     public static var ParseWrong: GINetError {
-        return .business(BasicInfo(success: false, message: "解析错误", code: -999))
+        return .business(BasicInfo(success: false, message: "数据错误", code: -999))
     }
     
     

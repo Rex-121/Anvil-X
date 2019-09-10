@@ -22,7 +22,7 @@ public protocol GI_NetworkingSession {
 public extension GI_NetworkingSession {
     
     
-    public static func defaultSession() -> SessionManager {
+    static func defaultSession() -> SessionManager {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 20
         configuration.timeoutIntervalForResource = 30
@@ -31,7 +31,7 @@ public extension GI_NetworkingSession {
     }
     
     
-    public static var defaultHTTPHeader: HTTPHeaders {
+    static var defaultHTTPHeader: HTTPHeaders {
         // Accept-Encoding HTTP Header; see https://tools.ietf.org/html/rfc7230#section-4.2.3
         let acceptEncoding: String = "gzip;q=1.0, compress;q=0.5"
         
@@ -71,7 +71,7 @@ public extension GI_NetworkingSession {
     }
     
     
-    public static func defaultPolicy() -> ServerTrustPolicyManager? { return ServerTrustPolicyManager(policies: ["test.dcpay.vip":.disableEvaluation, "www.dcpay.vip":.disableEvaluation]) }
+    static func defaultPolicy() -> ServerTrustPolicyManager? { return ServerTrustPolicyManager(policies: [String : ServerTrustPolicy]()) }
     
     
     
