@@ -37,7 +37,7 @@ class Tests: XCTestCase {
         let action = Action { self.net.detach(.version, SampleVersion.self) }
         
         action.values.observeValues { (version) in
-            print(version)
+            print("测试结果---", version)
             XCTAssert(true)
             success.fulfill()
         }
@@ -69,7 +69,7 @@ class Tests: XCTestCase {
         action.errors.observeValues { (error) in
             switch error {
             case .business(let info):
-                print(info)
+                print("测试结果---", info)
                 XCTAssert(true, error.description)
             case let .network(msg, res):
                 XCTAssert(false, msg)
@@ -107,7 +107,7 @@ class Tests: XCTestCase {
                 print(info)
                 XCTAssert(false)
             case let .network(msg, _):
-                print(msg)
+                print("测试结果---", msg)
                 XCTAssert(true, msg)
             }
             wrong404.fulfill()
@@ -139,7 +139,7 @@ class Tests: XCTestCase {
         action.errors.observeValues { (error) in
             switch error {
             case .business(let info):
-                print(info)
+                print("测试结果---", info)
                 XCTAssert(true)
             case let .network(msg, _):
                 print(msg)
