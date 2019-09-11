@@ -36,6 +36,9 @@ extension NetProvider {
     
     /// 网络请求 <GIResult<解析>, GINetError>
     ///
+    ///   - (1) 将未成功的网络请求(`MoyaError`)转译为`GINetError`
+    ///   - (2) 分析网络是否响应成功(200)
+    ///   - (3) 解析数据
     /// - Parameters:
     ///   - target: 网络目标
     ///   - codable: 解析方式

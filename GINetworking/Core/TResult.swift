@@ -112,7 +112,7 @@ public struct BasicInfo: CustomStringConvertible {
 
 extension GIResult {
     public static var ParseWrong: GIResult {
-        return GIResult(result: nil, message: "数据错误", code: -999, good: false)
+        return GIResult(result: nil, message: "数据异常，请联系客服", code: -999, good: false)
     }
 }
 
@@ -124,7 +124,7 @@ public enum GINetError: Error, CustomStringConvertible {
     
     /// 解析错误
     public static var ParseWrong: GINetError {
-        return .business(BasicInfo(success: false, message: "数据错误", code: -999))
+        return .business(BasicInfo(success: false, message: "数据异常，请联系客服", code: -999))
     }
     
     
