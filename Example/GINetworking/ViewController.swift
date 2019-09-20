@@ -25,9 +25,13 @@ class ViewController: UIViewController {
 //            print(result)
 //        })
 //        
-//        n.detach(.version, SampleVersionWrong.self).startWithResult({ (result) in
-//            print(result)
-//        })
+        n.detach(.version, SampleVersionWrong.self).startWithResult({ (result) in
+            print(result)
+        })
+        
+        n.detach(.wrongAtBusiness, SampleVersionWrong.self).startWithResult({ (result) in
+            print(result)
+        })
         
     }
 

@@ -33,7 +33,7 @@ public struct GIResult<Care: Decodable>: Decodable {
     
     /// 是否成功，后台信息
     public var info: BasicInfo {
-        return BasicInfo(success: good, message: message, code: code)
+        return BasicInfo(success: good, message: CodeInfo.default.message(by: code) ?? message, code: code)
     }
 
     /// 可能的错误信息　
