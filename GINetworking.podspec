@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'GINetworking'
-  s.version          = '0.2.0'
+  s.version          = '0.2.1'
   s.summary          = 'A short description of GINetworking.'
 
 # This description is used to generate tags and improve search results.
@@ -47,7 +47,7 @@ TODO: Add long description of the pod here.
   # s.frameworks = 'UIKit', 'MapKit'
   # s.dependency 'AFNetworking', '~> 2.3'
   
-  s.dependency 'Moya/ReactiveSwift', '14.0.0-alpha.1'
+  s.dependency 'Moya/ReactiveSwift', '14.0.0-beta.5'
   s.dependency 'XKit'
   
 end

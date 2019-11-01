@@ -46,22 +46,22 @@ extension NetProvider {
     open func launch<Engine>(_ target: T, _ decodable: Engine.Type, _ decoder: JSONDecoder/* = JSONDecoder()*/) -> SignalProducer<GIResult<Engine>, GINetError> where Engine: Decodable {
         return super.reactive.request(target)
             .parachute()
-            .attempt({ (response) -> Result<(), GINetError> in
+            .attempt({ (response) -> Swift.Result<(), GINetError> in
                 switch response.statusCode {
-                case 200: return Result(success: ())
-                default: return Result(failure: GINetError.network("网络错误 \(response.statusCode)", response))
+                case 200: return .success(())
+                default: return .failure(GINetError.network("网络错误 \(response.statusCode)", response))
                 }
             })
             .attemptMap({ (response) -> Result<GIResult<Engine>, GINetError> in
                 do {
                     let result = try decoder.decode(GIResult<Engine>.self, from: response.data)
                     if result.good {
-                        return Result(success: result)
+                        return .success(result)
                     }
-                    return Result(failure: result.errorInfo)
+                    return .failure(result.errorInfo)
                 } catch {
                     print(error)
-                    return Result(failure: .ParseWrong)
+                    return .failure(.ParseWrong)
                 }
             })
     }
@@ -87,8 +87,8 @@ extension NetProvider {
     /// - Returns: 解析, GINetError
     public func detach<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<Engine, GINetError> {
         return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<Engine, GINetError> in
-            guard let result = result.result else { return Result(failure: .ParseWrong) }
-            return Result(success: result)
+            guard let result = result.result else { return .failure(.ParseWrong) }
+            return .success(result)
         })
     }
     
@@ -115,8 +115,8 @@ extension NetProvider {
     @available(*, deprecated, message: "`dock` 关键词让行，请使用 `brief` 相应方法")
     public func docking<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
-            guard let value = result.result else { return Result(failure: .ParseWrong) }
-            return Result(success: (value, result.info))
+            guard let value = result.result else { return .failure(.ParseWrong) }
+            return .success((value, result.info))
         })
     }
     
@@ -154,8 +154,8 @@ extension NetProvider {
     /// - Returns: <(解析, BasicInfo), GINetError>
     public func briefing<Engine: Decodable>(_ target: T, _ codable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<(Engine, BasicInfo), GINetError> {
         return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<(Engine, BasicInfo), GINetError> in
-            guard let value = result.result else { return Result(failure: .ParseWrong) }
-            return Result(success: (value, result.info))
+            guard let value = result.result else { return .failure(.ParseWrong) }
+            return .success((value, result.info))
         })
     }
     
@@ -214,17 +214,17 @@ extension NetProvider {
                 
                 do {
                     let mainEngine = try JSONDecoder().decode(GIResult<Engine>.self, from: response.data)
-                    if mainEngine.good == false { return Result(failure: mainEngine.errorInfo) }
-                    if let res = mainEngine.result { return Result(success: .main(res)) }
+                    if mainEngine.good == false { return .failure(mainEngine.errorInfo) }
+                    if let res = mainEngine.result { return .success(.main(res)) }
                     throw GINetError.ParseWrong
                 }
                 catch {
                     do {
                         let secondEngine = try JSONDecoder().decode(GIResult<Second>.self, from: response.data)
                         guard let res = secondEngine.result else { throw GINetError.ParseWrong }
-                        return Result(success: .second(res))
+                        return .success(.second(res))
                     } catch {
-                        return Result(failure: GINetError.ParseWrong)
+                        return .failure(GINetError.ParseWrong)
                     }
                 }
                 
