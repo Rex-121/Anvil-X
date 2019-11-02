@@ -7,7 +7,6 @@
 
 import Moya
 
-public typealias MFData = Moya.MultipartFormData
 extension Dictionary where Value == String, Key == String {
     public func multipartData() -> [MFData] { return self.map { MultipartFormData(provider: .data($1.data(using: .utf8)!), name: $0) } }
 }

@@ -12,6 +12,8 @@ import Anvil
 
 import Moya
 
+import Alamofire
+
 
 struct K: GI_NetworkingSession {
     
@@ -40,6 +42,10 @@ class ViewController: UIViewController {
             print(result)
         })
         
+        
+//        ServerTrustPolice(evaluators: PinnedCertificates())
+//
+//        PinnedCertificatesTrustEvaluator(certificates: [SecCertificate], acceptSelfSignedCertificates: <#T##Bool#>, performDefaultValidation: <#T##Bool#>, validateHost: <#T##Bool#>)
     }
 
     override func didReceiveMemoryWarning() {

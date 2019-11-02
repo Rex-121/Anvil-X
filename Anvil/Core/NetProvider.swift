@@ -9,7 +9,6 @@ import Moya
 
 import ReactiveSwift
 
-public typealias TargetType = Moya.TargetType
 
 open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
     
