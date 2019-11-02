@@ -39,15 +39,7 @@ TODO: Add long description of the pod here.
       core.source_files = 'Anvil/Core/**/*'
       
       end
-  # s.resource_bundles = {
-  #   'GINetworking' => ['GINetworking/Assets/*.png']
-  # }
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
-  
   s.dependency 'Moya/ReactiveSwift', '14.0.0-alpha.1'
-  s.dependency 'XKit'
   
 end

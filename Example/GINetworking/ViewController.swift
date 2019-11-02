@@ -12,6 +12,11 @@ import Anvil
 
 import Moya
 
+
+struct K: GI_NetworkingSession {
+    
+}
+
 class ViewController: UIViewController {
     
     
@@ -20,6 +25,8 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        print(K.defaultHTTPHeader)
         
 //        n.detach(.version, SampleVersion.self).startWithResult({ (result) in
 //            print(result)

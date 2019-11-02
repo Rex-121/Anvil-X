@@ -13,9 +13,7 @@
 		607FACDD1AFB9204008FA782 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDC1AFB9204008FA782 /* Images.xcassets */; };
 		607FACE01AFB9204008FA782 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 607FACDE1AFB9204008FA782 /* LaunchScreen.xib */; };
 		607FACEC1AFB9204008FA782 /* Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACEB1AFB9204008FA782 /* Tests.swift */; };
-		71030CCA23279D8F00704872 /* NetGoing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71030CC923279D8F00704872 /* NetGoing.swift */; };
 		71030CCC23279D9A00704872 /* NetConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71030CCB23279D9A00704872 /* NetConfig.swift */; };
-		71030CCD23279FCD00704872 /* NetGoing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71030CC923279D8F00704872 /* NetGoing.swift */; };
 		71030CCE23279FD000704872 /* NetConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 71030CCB23279D9A00704872 /* NetConfig.swift */; };
 		A77D07A9CF5A1680130D470D /* Pods_GINetworking_Example.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = D6B7FDD22B05952396849FDF /* Pods_GINetworking_Example.framework */; };
 		C34A559EB604232B18158C52 /* Pods_GINetworking_Tests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 18EB61DEA9AE262ED1D03B9B /* Pods_GINetworking_Tests.framework */; };
@@ -49,7 +47,6 @@
 		607FACE51AFB9204008FA782 /* GINetworking_Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = GINetworking_Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		607FACEA1AFB9204008FA782 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		607FACEB1AFB9204008FA782 /* Tests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests.swift; sourceTree = "<group>"; };
-		71030CC923279D8F00704872 /* NetGoing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetGoing.swift; sourceTree = "<group>"; };
 		71030CCB23279D9A00704872 /* NetConfig.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetConfig.swift; sourceTree = "<group>"; };
 		D6B7FDD22B05952396849FDF /* Pods_GINetworking_Example.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GINetworking_Example.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ECF74EAE082F431A317C8283 /* Pods-GINetworking_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GINetworking_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GINetworking_Example/Pods-GINetworking_Example.debug.xcconfig"; sourceTree = "<group>"; };
@@ -101,7 +98,6 @@
 			children = (
 				607FACD51AFB9204008FA782 /* AppDelegate.swift */,
 				607FACD71AFB9204008FA782 /* ViewController.swift */,
-				71030CC923279D8F00704872 /* NetGoing.swift */,
 				71030CCB23279D9A00704872 /* NetConfig.swift */,
 				607FACD91AFB9204008FA782 /* Main.storyboard */,
 				607FACDC1AFB9204008FA782 /* Images.xcassets */,
@@ -344,7 +340,6 @@
 			files = (
 				607FACD81AFB9204008FA782 /* ViewController.swift in Sources */,
 				607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */,
-				71030CCA23279D8F00704872 /* NetGoing.swift in Sources */,
 				71030CCC23279D9A00704872 /* NetConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -353,7 +348,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				71030CCD23279FCD00704872 /* NetGoing.swift in Sources */,
 				71030CCE23279FD000704872 /* NetConfig.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* Tests.swift in Sources */,
 			);
