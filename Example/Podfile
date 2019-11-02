@@ -2,7 +2,7 @@ use_frameworks!
 
 target 'GINetworking_Example' do
     
-  pod 'GINetworking', :path => '../'
+  pod 'Anvil', :path => '../'
 
   pod 'XKit', :git => 'git@114.242.31.175:wangzhichen/iOS_X.git'
   

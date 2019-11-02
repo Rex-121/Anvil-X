@@ -1,6 +1,6 @@
 import XCTest
 
-@testable import GINetworking
+@testable import Anvil
 
 import ReactiveSwift
 

@@ -8,7 +8,7 @@
 
 import UIKit
 
-import GINetworking
+import Anvil
 
 import Moya
 

@@ -8,8 +8,8 @@
 
 import UIKit
 
-import GINetworking
-struct CC: GINetworking.CodeParse {
+import Anvil
+struct CC: Anvil.CodeParse {
     func message(by code: Int?) -> String? {
         return nil
         return "\(code ?? 0) to message"
@@ -25,7 +25,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     internal func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.
         
-        GINetworking.CodeInfo.default.tool = CC()
+        Anvil.CodeInfo.default.tool = CC()
         
         return true
     }

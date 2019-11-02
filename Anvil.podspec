@@ -7,8 +7,8 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'GINetworking'
-  s.version          = '0.2.2'
+  s.name             = 'Anvil'
+  s.version          = '0.2.3'
   s.summary          = 'A short description of GINetworking.'
 
 # This description is used to generate tags and improve search results.
@@ -36,7 +36,7 @@ TODO: Add long description of the pod here.
   
   s.subspec 'Core' do |core|
       
-      core.source_files = 'GINetworking/Core/**/*'
+      core.source_files = 'Anvil/Core/**/*'
       
       end
   # s.resource_bundles = {

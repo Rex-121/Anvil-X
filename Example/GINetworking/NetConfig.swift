@@ -8,7 +8,7 @@
 
 import Foundation
 
-import GINetworking
+import Anvil
 
 import Moya
 

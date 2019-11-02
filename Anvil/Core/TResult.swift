@@ -77,10 +77,10 @@ public struct GIResult<Care: Decodable>: Decodable {
     }
 }
 
-struct ReError: Error {
-    let message: String?
-    let code: Int?
-}
+//struct ReError: Error {
+//    let message: String?
+//    let code: Int?
+//}
 
 public struct BasicInfo: CustomStringConvertible {
     /// 是否成功
