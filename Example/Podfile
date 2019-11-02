@@ -4,7 +4,7 @@ target 'GINetworking_Example' do
     
   pod 'GINetworking', :path => '../'
 
-  pod 'XKit', :path => '../../XKit'
+  pod 'XKit', :git => 'git@114.242.31.175:wangzhichen/iOS_X.git'
   
   target 'GINetworking_Tests' do
     inherit! :search_paths
