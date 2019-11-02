@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'Anvil'
-  s.version          = '0.2.3'
+  s.version          = '0.3.0'
   s.summary          = 'A short description of GINetworking.'
 
 # This description is used to generate tags and improve search results.
@@ -40,6 +40,7 @@ TODO: Add long description of the pod here.
       
       end
 
-  s.dependency 'Moya/ReactiveSwift', '14.0.0-alpha.1'
+#  s.dependency 'Moya/ReactiveSwift', '14.0.0-alpha.1'
+  s.dependency 'Moya/ReactiveSwift', '14.0.0-beta.5'
   
 end

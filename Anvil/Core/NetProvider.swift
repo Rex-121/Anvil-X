@@ -18,10 +18,10 @@ open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
                          requestClosure: @escaping MoyaProvider<T>.RequestClosure = MoyaProvider<T>.defaultRequestMapping,
                          stubClosure: @escaping MoyaProvider<T>.StubClosure = MoyaProvider<T>.neverStub,
                          callbackQueue: DispatchQueue? = nil,
-                         manager: Manager = NetProvider<T>.defaultSession(),
+                         session: Session = NetProvider<T>.defaultSession(),
                          plugins: [PluginType] = [],
                          trackInflights: Bool = false) {
-        super.init(endpointClosure: endpointClosure, requestClosure: requestClosure, stubClosure: stubClosure, callbackQueue: callbackQueue, manager: manager, plugins: plugins, trackInflights: trackInflights)
+        super.init(endpointClosure: endpointClosure, requestClosure: requestClosure, stubClosure: stubClosure, callbackQueue: callbackQueue, session: session, plugins: plugins, trackInflights: trackInflights)
         
     }
     

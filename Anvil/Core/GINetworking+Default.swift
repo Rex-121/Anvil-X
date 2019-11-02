@@ -7,25 +7,27 @@
 
 import Alamofire
 
+import Moya
+
 public protocol GI_NetworkingSession {
     ///默认session
-    static func defaultSession() -> SessionManager
+    static func defaultSession() -> Moya.Session
     ///默认请求头
-    static var defaultHTTPHeader: HTTPHeaders { get }
+    static var defaultHTTPHeader: Alamofire.HTTPHeaders { get }
     ///默认安全策略
-    static func defaultPolicy() -> ServerTrustPolicyManager?
+    static func defaultPolicy() -> ServerTrustManager?
     
 }
 
 public extension GI_NetworkingSession {
     
     
-    static func defaultSession() -> SessionManager {
+    static func defaultSession() -> Moya.Session {
         let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 20
         configuration.timeoutIntervalForResource = 30
-        configuration.httpAdditionalHeaders = Self.defaultHTTPHeader
-        return SessionManager(configuration: configuration, delegate: SessionDelegate(), serverTrustPolicyManager: Self.defaultPolicy())
+        configuration.httpAdditionalHeaders = Self.defaultHTTPHeader.dictionary
+        return Moya.Session(configuration: configuration, delegate: SessionDelegate(), serverTrustManager: Self.defaultPolicy())
     }
     
     
@@ -45,7 +47,6 @@ public extension GI_NetworkingSession {
         let userAgent: String = {
             if let info = Bundle.main.infoDictionary {
                 let executable = info[kCFBundleExecutableKey as String] as? String ?? "Unknown"
-                let bundle = info[kCFBundleIdentifierKey as String] as? String ?? "Unknown"
                 let appVersion = info["CFBundleShortVersionString"] as? String ?? "Unknown"
                 let appBuild = info[kCFBundleVersionKey as String] as? String ?? "Unknown"
 
@@ -72,7 +73,7 @@ public extension GI_NetworkingSession {
                     return "\(osName) \(versionString)"
                 }()
 
-                return "\(executable)/\(appVersion) (\(bundle); build:\(appBuild); \(osNameVersion))"
+                return "\(executable)/\(appVersion) (build:\(appBuild); \(osNameVersion))"
             }
 
             return "Anvil"
@@ -152,7 +153,7 @@ public extension GI_NetworkingSession {
     }
     
     
-    static func defaultPolicy() -> ServerTrustPolicyManager? { return ServerTrustPolicyManager(policies: [String : ServerTrustPolicy]()) }
+    static func defaultPolicy() -> ServerTrustManager? { return ServerTrustManager(evaluators: [String : ServerTrustEvaluating]()) }
     
     
     
