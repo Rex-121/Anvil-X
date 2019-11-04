@@ -61,11 +61,17 @@ public struct GIResult<Care: Decodable>: Decodable {
         
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        good = try container.decode(Bool.self, forKey: .good)
-        
+        let successValue = try container.decodeIfPresent(Bool.self, forKey: .good)
+
         message = try container.decodeIfPresent(String.self, forKey: .message)
         
         code = try container.decodeIfPresent(Int.self, forKey: .code)
+        
+        if let value = successValue {
+            good = value
+        } else {
+            good = code == 200
+        }
         
         if Care.self == DontCare.self {
             result = DontCare() as? Care

@@ -30,23 +30,19 @@ class ViewController: UIViewController {
         
         print(K.defaultHTTPHeader)
         
-//        n.detach(.version, SampleVersion.self).startWithResult({ (result) in
+//        n.detach(.version, SampleVersionWrong.self).startWithResult({ (result) in
 //            print(result)
 //        })
 //        
-        n.detach(.version, SampleVersionWrong.self).startWithResult({ (result) in
-            print(result)
-        })
+//        n.detach(.wrongAtBusiness, SampleVersionWrong.self).startWithResult({ (result) in
+//            print(result)
+//        })
         
-        n.detach(.wrongAtBusiness, SampleVersionWrong.self).startWithResult({ (result) in
-            print(result)
-        })
+        k.brief(.login, String.self).startWithResult { print($0) }
         
-        
-//        ServerTrustPolice(evaluators: PinnedCertificates())
-//
-//        PinnedCertificatesTrustEvaluator(certificates: [SecCertificate], acceptSelfSignedCertificates: <#T##Bool#>, performDefaultValidation: <#T##Bool#>, validateHost: <#T##Bool#>)
     }
+    
+    let k = NetProvider<XNet>()
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -54,4 +50,5 @@ class ViewController: UIViewController {
     }
 
 }
+ 
 

@@ -79,3 +79,33 @@ enum NetBusiness: TargetType {
     
     
 }
+
+
+enum XNet {
+    case login
+    
+    
+}
+
+
+extension XNet: TargetType {
+    var headers: [String : String]? {
+        return nil
+    }
+    
+    var baseURL: URL {
+        return URL(string: "http://192.168.1.215:38090/gichain-exchange-app")!
+    }
+    
+    var path: String {
+        switch self {
+        case .login: return "/api/user/validLogin"
+        }
+    }
+    
+    var method: Moya.Method { return .post }
+    
+    var sampleData: Data { return Data() }
+    
+    var task: Task { return .uploadMultipart(["account":"a", "password":"p.gi.md5"].multipartData()) }
+}
