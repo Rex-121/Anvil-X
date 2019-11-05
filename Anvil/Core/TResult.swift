@@ -70,7 +70,7 @@ public struct GIResult<Care: Decodable>: Decodable {
         if let value = successValue {
             good = value
         } else {
-            good = code == 200
+            good = code == 0
         }
         
         if Care.self == DontCare.self {
