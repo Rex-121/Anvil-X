@@ -10,17 +10,19 @@ import Moya
 import ReactiveSwift
 
 
-open class NetProvider<T: TargetType>: MoyaProvider<T>, GI_NetworkingSession {
+open class NetProvider<T: TargetType>: AnvilSessionProvider {
     
     
-    public override init(endpointClosure: @escaping MoyaProvider<T>.EndpointClosure = MoyaProvider<T>.defaultEndpointMapping,
+    let moya: MoyaProvider<T>
+    
+    public init(endpointClosure: @escaping MoyaProvider<T>.EndpointClosure = MoyaProvider<T>.defaultEndpointMapping,
                          requestClosure: @escaping MoyaProvider<T>.RequestClosure = MoyaProvider<T>.defaultRequestMapping,
                          stubClosure: @escaping MoyaProvider<T>.StubClosure = MoyaProvider<T>.neverStub,
                          callbackQueue: DispatchQueue? = nil,
-                         session: Session = NetProvider<T>.defaultSession(),
+                         session: Session = AnvilDefaultSession.defaultSession(),
                          plugins: [PluginType] = [],
                          trackInflights: Bool = false) {
-        super.init(endpointClosure: endpointClosure, requestClosure: requestClosure, stubClosure: stubClosure, callbackQueue: callbackQueue, session: session, plugins: plugins, trackInflights: trackInflights)
+        moya = MoyaProvider(endpointClosure: endpointClosure, requestClosure: requestClosure, stubClosure: stubClosure, callbackQueue: callbackQueue, session: session, plugins: plugins, trackInflights: trackInflights)
         
     }
     

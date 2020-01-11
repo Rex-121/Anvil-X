@@ -15,7 +15,7 @@ import Moya
 import Alamofire
 
 
-struct K: GI_NetworkingSession {
+struct K: AnvilSessionProvider {
     
 }
 

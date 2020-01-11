@@ -36,7 +36,7 @@ public struct GIResult<Care: Decodable>: Decodable {
     }
 
     /// 可能的错误信息　
-    public var errorInfo: GINetError {
+    public var errorInfo: AnvilNetError {
         return .business(info)
     }
     
@@ -122,13 +122,13 @@ extension GIResult {
 }
 
 
-public enum GINetError: Error, CustomStringConvertible {
+public enum AnvilNetError: Error, CustomStringConvertible {
     
     case business(BasicInfo), network(String, Response?)
     
     
     /// 解析错误
-    public static var ParseWrong: GINetError {
+    public static var ParseWrong: AnvilNetError {
         return .business(BasicInfo(success: false, message: "数据异常，请联系客服", code: -999))
     }
     
@@ -140,7 +140,7 @@ public enum GINetError: Error, CustomStringConvertible {
     ///   - success: 是否成功 默认为 false
     ///   - code: 错误码 默认为 -1740
     /// - Returns: 业务错误
-    public static func at<B: CustomStringConvertible>(business: B?, _ success: Bool = false, _ code: Int = -1740) -> GINetError {
+    public static func at<B: CustomStringConvertible>(business: B?, _ success: Bool = false, _ code: Int = -1740) -> AnvilNetError {
         return .business(BasicInfo(success: success, message: business?.description, code: code))
     }
 

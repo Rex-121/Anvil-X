@@ -1,5 +1,5 @@
 //
-//  GINetworking+Default.swift
+//  AnvilSessionProvider.swift
 //  Alamofire
 //
 //  Created by Ray on 2018/11/16.
@@ -8,7 +8,7 @@
 
 import Moya
 
-public protocol GI_NetworkingSession {
+public protocol AnvilSessionProvider {
     ///默认session
     static func defaultSession() -> Session
     ///默认请求头
@@ -18,7 +18,7 @@ public protocol GI_NetworkingSession {
     
 }
 
-public extension GI_NetworkingSession {
+public extension AnvilSessionProvider {
     
     
     static func defaultSession() -> Session {
@@ -86,9 +86,12 @@ public extension GI_NetworkingSession {
     }
     
     
-    static func defaultPolicy() -> ServerTrustPolice? { return ServerTrustPolice(evaluators: [String : ServerPoliceEvaluating]()) }
+    static func defaultPolicy() -> ServerTrustPolice? { return nil }
     
     
     
 }
+
+
+public struct AnvilDefaultSession: AnvilSessionProvider { }
 
