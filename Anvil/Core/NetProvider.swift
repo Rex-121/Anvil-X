@@ -14,7 +14,7 @@ open class NetProvider<T: AnvilTargetType>: AnvilSessionProvider {
     
 
     
-    let moya: MoyaProvider<T>
+    public let moya: MoyaProvider<T>
     
     public init(endpointClosure: @escaping MoyaProvider<T>.EndpointClosure = MoyaProvider<T>.defaultEndpointMapping,
                          requestClosure: @escaping MoyaProvider<T>.RequestClosure = MoyaProvider<T>.defaultRequestMapping,
