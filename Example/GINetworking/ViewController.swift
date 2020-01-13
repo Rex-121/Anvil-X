@@ -24,7 +24,7 @@ class ViewController: UIViewController {
     
 
     let n = NetProvider<NetBusiness>()
-    
+    let nz = NetProvider<NetBusiness>()
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -38,11 +38,15 @@ class ViewController: UIViewController {
 //            print(result)
 //        })
         
-        k.brief(.login, String.self).startWithResult { print($0) }
+//        k.brief(.login, String.self).startWithResult { print($0) }
+        
+        nz.baseRequest(.version, SampleVersion.self).startWithResult { (result) in
+            print(result)
+        }
         
     }
     
-    let k = NetProvider<XNet>()
+//    let k = NetProvider<XNet>()
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -51,4 +55,34 @@ class ViewController: UIViewController {
 
 }
  
+
+enum xxxnet {
+    case login
+    
+    
+}
+
+
+extension xxxnet: AnvilTargetType {    
+    
+    var headers: [String : String]? {
+        return nil
+    }
+    
+    var baseURL: URL {
+        return URL(string: "http://192.168.1.215:38090/gichain-exchange-app")!
+    }
+    
+    var path: String {
+        switch self {
+        case .login: return "/api/user/validLogin"
+        }
+    }
+    
+    var method: Moya.Method { return .post }
+    
+    var sampleData: Data { return Data() }
+    
+    var task: Task { return .uploadMultipart(["account":"a", "password":"p.gi.md5"].multipartData()) }
+}
 

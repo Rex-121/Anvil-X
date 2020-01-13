@@ -29,7 +29,7 @@ struct SampleVersionWrong: Codable {
 }
 
 
-enum NetBusiness: TargetType {
+enum NetBusiness: AnvilTargetType {
     
     case version
     

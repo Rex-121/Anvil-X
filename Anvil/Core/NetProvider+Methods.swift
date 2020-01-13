@@ -43,7 +43,7 @@ extension NetProvider {
     /// - Returns: GIResult<解析>, AnvilNetError
     open func launch<Engine>(_ target: T, _ decodable: Engine.Type, _ decoder: JSONDecoder) -> SignalProducer<GIResult<Engine>, AnvilNetError> where Engine: Decodable {
         return self.moya.reactive.request(target)
-            .parachute()
+            .parseMoyaError()
             .attempt { Response.survive($0, goal: 200) }
             .attemptMap({ (response) -> Result<GIResult<Engine>, AnvilNetError> in
                 do {
@@ -166,7 +166,7 @@ extension NetProvider {
     open func launch<Engine: Decodable, Second: Decodable>(_ target: T, main engine: Engine.Type, second: Second.Type) -> SignalProducer<NetProvider.Engine<Engine, Second>, AnvilNetError> {
         
         return self.moya.reactive.request(target)
-            .parachute()
+            .parseMoyaError()
             .attemptMap { (response) -> Result<NetProvider.Engine<Engine, Second>, AnvilNetError> in
                 
                 do {
@@ -193,7 +193,7 @@ extension NetProvider {
 extension NetProvider {
     
     public func progressed(_ target: T) -> SignalProducer<ProgressResponse, AnvilNetError> {
-        return self.moya.reactive.requestWithProgress(target).parachute()
+        return self.moya.reactive.requestWithProgress(target).parseMoyaError()
     }
     
 }
@@ -227,7 +227,7 @@ extension SignalProducer where Error == MoyaError {
     /// 将 `MoyaError` 转换为 `AnvilNetError`
     ///
     /// - Returns: SignalProducer<Value, AnvilNetError>
-    func parachute() -> SignalProducer<Value, AnvilNetError> {
+    func parseMoyaError() -> SignalProducer<Value, AnvilNetError> {
         
         return mapError { (my) -> AnvilNetError in
             
@@ -268,26 +268,36 @@ extension NetProvider {
     ///   - target: 网络目标
     ///   - codable: 解析方式
     /// - Returns: GIResult<解析>, AnvilNetError
-    open func baseRequest<Engine>(_ target: T, _ decodable: Engine.Type, _ decoder: JSONDecoder) -> SignalProducer<GIResult<Engine>, AnvilNetError> where Engine: Decodable {
+    open func baseRequest<Engine>(_ target: T, _ decodable: Engine.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<AnvilResult<Engine>, AnvilNetError> where Engine: Decodable {
+        
         return self.moya.reactive.request(target)
-            .parachute()
+            .parseMoyaError()
             .attempt { Response.survive($0, goal: 200) }
-            .attemptMap({ (response) -> Result<GIResult<Engine>, AnvilNetError> in
+            .attemptMap({ (response) -> Result<AnvilResult<Engine>, AnvilNetError> in
+
                 do {
-                    let result = try decoder.decode(GIResult<Engine>.self, from: response.data)
-                    if result.good {
-                        return .success(result)
-                    }
-                    return .failure(result.errorInfo)
+                    return .success(try decoder.decode(AnvilResult<Engine>.self, from: response.data))
                 } catch {
-                    print(error)
                     return .failure(.ParseWrong)
                 }
+                
             })
     }
     
     
-    
+    public func briefingOptions<Engine: Decodable>(_ target: T, _ codable: Optional<Engine>.Type, _ decoder: JSONDecoder = JSONDecoder()) -> SignalProducer<(Engine?, BasicInfo), AnvilNetError> {
+        return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<(Engine?, BasicInfo), AnvilNetError> in
+            guard let value = result.result else {
+                
+                if result.good {
+                    return .success((nil, result.info))
+                }
+                
+                return .failure(.ParseWrong)
+            }
+            return .success((value, result.info))
+        })
+    }
     
     
     

@@ -10,8 +10,9 @@ import Moya
 import ReactiveSwift
 
 
-open class NetProvider<T: TargetType>: AnvilSessionProvider {
+open class NetProvider<T: AnvilTargetType>: AnvilSessionProvider {
     
+
     
     let moya: MoyaProvider<T>
     
