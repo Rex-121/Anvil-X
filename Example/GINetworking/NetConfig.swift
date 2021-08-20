@@ -38,12 +38,12 @@ enum NetBusiness: AnvilTargetType {
     case wrongAtBusiness
     
     var baseURL: URL {
-        return URL(string: "http://192.168.1.189:8080/merchant_app")!
+        return URL(string: "http://appcourse.roobo.com.cn/student/v1")!
     }
     
     var path: String {
         switch self {
-        case .version: return "/app/version/list"
+        case .version: return "/user/getAuthcode"
         case .net404: return "/app/version/404"
         case .wrongAtBusiness: return "/merchant/personal/info"
             
@@ -66,6 +66,11 @@ enum NetBusiness: AnvilTargetType {
     var task: Task {
         switch self {
         case .wrongAtBusiness: return .requestPlain
+        case .version:
+            var body = [ "pcode": "+86","phone": "18511234520","lang": "zh","allow": "authcode-login"]
+            let  data2 :Data! = try? JSONSerialization.data(withJSONObject: body, options: [])
+            
+            return .requestData(data2)
         default:
             let a = MultipartFormData(provider: MultipartFormData.FormDataProvider.data("4".data(using: .utf8)!), name: "type")
             return .uploadMultipart([a])
@@ -74,7 +79,7 @@ enum NetBusiness: AnvilTargetType {
     }
     
     var headers: [String : String]? {
-        return nil
+        return ["Content-Type" : "application/json", "Authorization":"GoRoobo eyJhcHBQYWNrYWdlSUQiOiJhVWxhOEhLQWgiLCJhcHBJRCI6Ik9HSTFaV0l5TkdJNE0yVTMiLCJ0cyI6MjUsImF1dGgiOnsiYXBwVXNlcklEIjpudWxsLCJhY2Nlc3NUb2tlbiI6bnVsbCwiYWNjZXNzVG9rZW5FeHBpcmVzIjpudWxsLCJyZWZyZXNoVG9rZW4iOm51bGwsInJlZnJlc2hUb2tlbkV4cGlyZXMiOm51bGx9LCJhcHAiOnsidmlhIjoiV2ViIiwiYXBwIjoiIiwiYXZlciI6IiIsImN2ZXIiOiIiLCJtb2RlbCI6IiIsImxvY2FsIjoiZW5fVVMiLCJjaCI6IjEwMDAwIiwibmV0IjoiIn19.6085942a88a3848581d84de930ebbfd5"]
     }
     
     

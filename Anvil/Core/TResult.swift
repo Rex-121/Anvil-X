@@ -24,15 +24,15 @@ public struct GIResult<Care: Decodable>: Decodable {
     ///请求码
     public let code: Int?
     
-    public let good: Bool
+    public var good: Bool { code == 0 }
     
     private enum CodingKeys: String, CodingKey {
-        case result = "data", code, message, good = "success"
+        case result = "data", code = "result", message = "msg"//, good = "success"
     }
     
     /// 是否成功，后台信息
     public var info: BasicInfo {
-        return BasicInfo(success: good, message: CodeInfo.default.message(by: code) ?? message, code: code)
+        return BasicInfo(message: CodeInfo.default.message(by: code) ?? message, code: code)
     }
 
     /// 可能的错误信息　
@@ -52,7 +52,7 @@ public struct GIResult<Care: Decodable>: Decodable {
         self.result = result
         self.message = message
         self.code = code
-        self.good = good
+//        self.good = good
     }
    
     
@@ -61,17 +61,17 @@ public struct GIResult<Care: Decodable>: Decodable {
         
         let container = try decoder.container(keyedBy: CodingKeys.self)
         
-        let successValue = try container.decodeIfPresent(Bool.self, forKey: .good)
+//        let successValue = try container.decodeIfPresent(Bool.self, forKey: .good)
 
         message = try container.decodeIfPresent(String.self, forKey: .message)
         
         code = try container.decodeIfPresent(Int.self, forKey: .code)
         
-        if let value = successValue {
-            good = value
-        } else {
-            good = code == 0
-        }
+//        if let value = successValue {
+//            good = value
+//        } else {
+//            good = code == 0
+//        }
         
         if Care.self == DontCare.self {
             result = DontCare() as? Care
@@ -89,7 +89,7 @@ public struct GIResult<Care: Decodable>: Decodable {
 
 public struct BasicInfo: CustomStringConvertible {
     /// 是否成功
-    public let success: Bool
+    public var success: Bool { code == 0 }
     
     /// 信息
     public let message: String?
@@ -108,8 +108,7 @@ public struct BasicInfo: CustomStringConvertible {
         return message ?? ""
     }
     
-    public init(success: Bool, message: String?, code: Int?) {
-        self.success = success
+    public init(message: String?, code: Int?) {
         self.message = message
         self.code = code
     }
@@ -129,7 +128,7 @@ public enum AnvilNetError: Error, CustomStringConvertible {
     
     /// 解析错误
     public static var ParseWrong: AnvilNetError {
-        return .business(BasicInfo(success: false, message: "数据异常，请联系客服", code: -999))
+        return .business(BasicInfo(message: "数据异常，请联系客服", code: -999))
     }
     
     
@@ -141,7 +140,7 @@ public enum AnvilNetError: Error, CustomStringConvertible {
     ///   - code: 错误码 默认为 -1740
     /// - Returns: 业务错误
     public static func at<B: CustomStringConvertible>(business: B?, _ success: Bool = false, _ code: Int = -1740) -> AnvilNetError {
-        return .business(BasicInfo(success: success, message: business?.description, code: code))
+        return .business(BasicInfo(message: business?.description, code: code))
     }
 
     /// 原始的信息

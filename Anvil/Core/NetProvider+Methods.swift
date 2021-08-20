@@ -53,7 +53,6 @@ extension NetProvider {
                     }
                     return .failure(result.errorInfo)
                 } catch {
-                    print(error)
                     return .failure(.ParseWrong)
                 }
             })
@@ -289,7 +288,7 @@ extension NetProvider {
         return self.launch(target, codable, decoder).attemptMap({ (result) -> Result<(Engine?, BasicInfo), AnvilNetError> in
             guard let value = result.result else {
                 
-                if result.good {
+                if result.good ?? false {
                     return .success((nil, result.info))
                 }
                 
